@@ -1,0 +1,43 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+SHELL = cmd.exe
+
+# Each subdirectory must supply rules for building sources it contributes
+My\ Files/Src/Common_Memmap.obj: ../My\ Files/Src/Common_Memmap.c $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: C2000 Compiler'
+	"C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu64 --idiv_support=idiv0 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --fp_mode=relaxed --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2" --include_path="C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Common Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Headers Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib/inc" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/My Files/Headers" --define=CPU2 --define=DEBUG --define=_FLASH -g --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi --preproc_with_compile --preproc_dependency="My Files/Src/Common_Memmap.d_raw" --obj_directory="My Files/Src" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
+My\ Files/Src/Control_Variables.obj: ../My\ Files/Src/Control_Variables.c $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: C2000 Compiler'
+	"C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu64 --idiv_support=idiv0 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --fp_mode=relaxed --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2" --include_path="C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Common Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Headers Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib/inc" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/My Files/Headers" --define=CPU2 --define=DEBUG --define=_FLASH -g --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi --preproc_with_compile --preproc_dependency="My Files/Src/Control_Variables.d_raw" --obj_directory="My Files/Src" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
+My\ Files/Src/Ref_Gen.obj: ../My\ Files/Src/Ref_Gen.c $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: C2000 Compiler'
+	"C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu64 --idiv_support=idiv0 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --fp_mode=relaxed --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2" --include_path="C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Common Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Headers Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib/inc" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/My Files/Headers" --define=CPU2 --define=DEBUG --define=_FLASH -g --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi --preproc_with_compile --preproc_dependency="My Files/Src/Ref_Gen.d_raw" --obj_directory="My Files/Src" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
+My\ Files/Src/modbus_CRC.obj: ../My\ Files/Src/modbus_CRC.c $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: C2000 Compiler'
+	"C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu64 --idiv_support=idiv0 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --fp_mode=relaxed --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2" --include_path="C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Common Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Headers Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib/inc" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/My Files/Headers" --define=CPU2 --define=DEBUG --define=_FLASH -g --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi --preproc_with_compile --preproc_dependency="My Files/Src/modbus_CRC.d_raw" --obj_directory="My Files/Src" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
+My\ Files/Src/uart.obj: ../My\ Files/Src/uart.c $(GEN_OPTS) | $(GEN_FILES) $(GEN_MISC_FILES)
+	@echo 'Building file: "$<"'
+	@echo 'Invoking: C2000 Compiler'
+	"C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu64 --idiv_support=idiv0 --tmu_support=tmu0 --vcu_support=vcrc -Ooff --fp_mode=relaxed --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2" --include_path="C:/ti/ccs1200/ccs/tools/compiler/ti-cgt-c2000_22.6.0.LTS/include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Common Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/Headers Include" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/Device/driverlib/inc" --include_path="C:/Users/RnD-L1/Desktop/Inverter_Side_cpu2/My Files/Headers" --define=CPU2 --define=DEBUG --define=_FLASH -g --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi --preproc_with_compile --preproc_dependency="My Files/Src/uart.d_raw" --obj_directory="My Files/Src" $(GEN_OPTS__FLAG) "$<"
+	@echo 'Finished building: "$<"'
+	@echo ' '
+
+

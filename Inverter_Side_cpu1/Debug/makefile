@@ -1,0 +1,239 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+SHELL = cmd.exe
+
+CG_TOOL_ROOT := C:/ti/ccs1281/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS
+
+GEN_OPTS__FLAG := 
+GEN_CMDS__FLAG := 
+
+ORDERED_OBJS += \
+"./Inverter_Side_CPU1_main.obj" \
+"./Device/Common Sources/device.obj" \
+"./Device/Common Sources/f2838x_adc.obj" \
+"./Device/Common Sources/f2838x_codestartbranch.obj" \
+"./Device/Common Sources/f2838x_cputimers.obj" \
+"./Device/Common Sources/f2838x_defaultisr.obj" \
+"./Device/Common Sources/f2838x_dma.obj" \
+"./Device/Common Sources/f2838x_ecap.obj" \
+"./Device/Common Sources/f2838x_epwm.obj" \
+"./Device/Common Sources/f2838x_gpio.obj" \
+"./Device/Common Sources/f2838x_piectrl.obj" \
+"./Device/Common Sources/f2838x_pievect.obj" \
+"./Device/Common Sources/f2838x_sysctrl.obj" \
+"./Device/Common Sources/f2838x_usdelay.obj" \
+"./Device/Header Sources/f2838x_globalvariabledefs.obj" \
+"./Device/driverlib/adc.obj" \
+"./Device/driverlib/asysctl.obj" \
+"./Device/driverlib/bgcrc.obj" \
+"./Device/driverlib/can.obj" \
+"./Device/driverlib/cla.obj" \
+"./Device/driverlib/clb.obj" \
+"./Device/driverlib/cmpss.obj" \
+"./Device/driverlib/cputimer.obj" \
+"./Device/driverlib/dac.obj" \
+"./Device/driverlib/dcc.obj" \
+"./Device/driverlib/dcsm.obj" \
+"./Device/driverlib/dma.obj" \
+"./Device/driverlib/ecap.obj" \
+"./Device/driverlib/emif.obj" \
+"./Device/driverlib/epwm.obj" \
+"./Device/driverlib/eqep.obj" \
+"./Device/driverlib/erad.obj" \
+"./Device/driverlib/escss.obj" \
+"./Device/driverlib/flash.obj" \
+"./Device/driverlib/fsi.obj" \
+"./Device/driverlib/gpio.obj" \
+"./Device/driverlib/hrcap.obj" \
+"./Device/driverlib/hrpwm.obj" \
+"./Device/driverlib/i2c.obj" \
+"./Device/driverlib/interrupt.obj" \
+"./Device/driverlib/ipc.obj" \
+"./Device/driverlib/mcan.obj" \
+"./Device/driverlib/mcbsp.obj" \
+"./Device/driverlib/memcfg.obj" \
+"./Device/driverlib/pmbus.obj" \
+"./Device/driverlib/sci.obj" \
+"./Device/driverlib/sdfm.obj" \
+"./Device/driverlib/spi.obj" \
+"./Device/driverlib/sysctl.obj" \
+"./Device/driverlib/usb.obj" \
+"./Device/driverlib/version.obj" \
+"./Device/driverlib/xbar.obj" \
+"./Libraries/DCL_Control Source/DCL_DF22_C1.obj" \
+"./Libraries/DCL_Control Source/DCL_PI_C4.obj" \
+"./My Files/Src/Common_Memmap.obj" \
+"./My Files/Src/Control_Variables.obj" \
+"./My Files/Src/NPC_Hardware_Setup.obj" \
+"./My Files/Src/NPC_Solution.obj" \
+"../2838x_FLASH_lnk_cpu1.cmd" \
+"../f2838x_headers_nonBIOS_cpu1.cmd" \
+"../Device/Compiler/c28x_fpu_dsp_library.lib" \
+"../Device/Compiler/c28x_fpu_dsp_library_eabi.lib" \
+"../Device/driverlib/ccs/Debug/driverlib.lib" \
+"../Device/driverlib/ccs/Release/driverlib.lib" \
+"../Libraries/SFRA/sfra.lib" \
+"../Libraries/SFRA/sfra_f64_tmu_eabi.lib" \
+$(GEN_CMDS__FLAG) \
+-llibc.a \
+-l"C:/Users/LENEVO/Desktop/one_phase_C2000/ACPS_1phase/Inverter_Side_cpu1/Device/Compiler/rts2800_fpu64_eabi.lib" \
+
+-include ../makefile.init
+
+RM := DEL /F
+RMDIR := RMDIR /S/Q
+
+# All of the sources participating in the build are defined here
+-include sources.mk
+-include subdir_vars.mk
+-include Device/Common\ Sources/subdir_vars.mk
+-include Device/Compiler/subdir_vars.mk
+-include Device/Header\ Sources/subdir_vars.mk
+-include Device/driverlib/subdir_vars.mk
+-include Device/driverlib/ccs/Debug/subdir_vars.mk
+-include Device/driverlib/ccs/Release/subdir_vars.mk
+-include Libraries/DCL_Control\ Source/subdir_vars.mk
+-include Libraries/SFRA/subdir_vars.mk
+-include My\ Files/Src/subdir_vars.mk
+-include subdir_rules.mk
+-include Device/Common\ Sources/subdir_rules.mk
+-include Device/Compiler/subdir_rules.mk
+-include Device/Header\ Sources/subdir_rules.mk
+-include Device/driverlib/subdir_rules.mk
+-include Device/driverlib/ccs/Debug/subdir_rules.mk
+-include Device/driverlib/ccs/Release/subdir_rules.mk
+-include Libraries/DCL_Control\ Source/subdir_rules.mk
+-include Libraries/SFRA/subdir_rules.mk
+-include My\ Files/Src/subdir_rules.mk
+-include objects.mk
+
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(strip $(C55_DEPS)),)
+-include $(C55_DEPS)
+endif
+ifneq ($(strip $(C_UPPER_DEPS)),)
+-include $(C_UPPER_DEPS)
+endif
+ifneq ($(strip $(S67_DEPS)),)
+-include $(S67_DEPS)
+endif
+ifneq ($(strip $(S62_DEPS)),)
+-include $(S62_DEPS)
+endif
+ifneq ($(strip $(S_DEPS)),)
+-include $(S_DEPS)
+endif
+ifneq ($(strip $(OPT_DEPS)),)
+-include $(OPT_DEPS)
+endif
+ifneq ($(strip $(C??_DEPS)),)
+-include $(C??_DEPS)
+endif
+ifneq ($(strip $(ASM_UPPER_DEPS)),)
+-include $(ASM_UPPER_DEPS)
+endif
+ifneq ($(strip $(S??_DEPS)),)
+-include $(S??_DEPS)
+endif
+ifneq ($(strip $(C64_DEPS)),)
+-include $(C64_DEPS)
+endif
+ifneq ($(strip $(CXX_DEPS)),)
+-include $(CXX_DEPS)
+endif
+ifneq ($(strip $(S64_DEPS)),)
+-include $(S64_DEPS)
+endif
+ifneq ($(strip $(INO_DEPS)),)
+-include $(INO_DEPS)
+endif
+ifneq ($(strip $(CLA_DEPS)),)
+-include $(CLA_DEPS)
+endif
+ifneq ($(strip $(S55_DEPS)),)
+-include $(S55_DEPS)
+endif
+ifneq ($(strip $(SV7A_DEPS)),)
+-include $(SV7A_DEPS)
+endif
+ifneq ($(strip $(C62_DEPS)),)
+-include $(C62_DEPS)
+endif
+ifneq ($(strip $(C67_DEPS)),)
+-include $(C67_DEPS)
+endif
+ifneq ($(strip $(PDE_DEPS)),)
+-include $(PDE_DEPS)
+endif
+ifneq ($(strip $(K_DEPS)),)
+-include $(K_DEPS)
+endif
+ifneq ($(strip $(C_DEPS)),)
+-include $(C_DEPS)
+endif
+ifneq ($(strip $(CC_DEPS)),)
+-include $(CC_DEPS)
+endif
+ifneq ($(strip $(C++_DEPS)),)
+-include $(C++_DEPS)
+endif
+ifneq ($(strip $(C43_DEPS)),)
+-include $(C43_DEPS)
+endif
+ifneq ($(strip $(S43_DEPS)),)
+-include $(S43_DEPS)
+endif
+ifneq ($(strip $(ASM_DEPS)),)
+-include $(ASM_DEPS)
+endif
+ifneq ($(strip $(S_UPPER_DEPS)),)
+-include $(S_UPPER_DEPS)
+endif
+ifneq ($(strip $(CPP_DEPS)),)
+-include $(CPP_DEPS)
+endif
+ifneq ($(strip $(SA_DEPS)),)
+-include $(SA_DEPS)
+endif
+endif
+
+-include ../makefile.defs
+
+# Add inputs and outputs from these tool invocations to the build variables 
+EXE_OUTPUTS += \
+Inverter_Side_cpu1.out 
+
+EXE_OUTPUTS__QUOTED += \
+"Inverter_Side_cpu1.out" 
+
+
+# All Target
+all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
+	@$(MAKE) --no-print-directory -Onone "Inverter_Side_cpu1.out"
+
+# Tool invocations
+Inverter_Side_cpu1.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
+	@echo 'Building target: "$@"'
+	@echo 'Invoking: C2000 Linker'
+	"C:/ti/ccs1281/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --idiv_support=idiv0 --tmu_support=tmu0 --vcu_support=vcrc --fp_mode=relaxed --advice:performance=all --define=CPU1 --define=DEBUG --define=_FLASH --define=_LAUNCHXL_F28388D -g --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"Inverter_Side_cpu1.map" --stack_size=0x200 --warn_sections -i"C:/ti/ccs1281/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/ccs1281/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="Inverter_Side_cpu1_linkInfo.xml" --rom_model -o "Inverter_Side_cpu1.out" $(ORDERED_OBJS)
+	@echo 'Finished building target: "$@"'
+	@echo ' '
+
+# Other Targets
+clean:
+	-$(RM) $(EXE_OUTPUTS__QUOTED)
+	-$(RM) "Inverter_Side_CPU1_main.obj" "Device\Common Sources\device.obj" "Device\Common Sources\f2838x_adc.obj" "Device\Common Sources\f2838x_codestartbranch.obj" "Device\Common Sources\f2838x_cputimers.obj" "Device\Common Sources\f2838x_defaultisr.obj" "Device\Common Sources\f2838x_dma.obj" "Device\Common Sources\f2838x_ecap.obj" "Device\Common Sources\f2838x_epwm.obj" "Device\Common Sources\f2838x_gpio.obj" "Device\Common Sources\f2838x_piectrl.obj" "Device\Common Sources\f2838x_pievect.obj" "Device\Common Sources\f2838x_sysctrl.obj" "Device\Common Sources\f2838x_usdelay.obj" "Device\Header Sources\f2838x_globalvariabledefs.obj" "Device\driverlib\adc.obj" "Device\driverlib\asysctl.obj" "Device\driverlib\bgcrc.obj" "Device\driverlib\can.obj" "Device\driverlib\cla.obj" "Device\driverlib\clb.obj" "Device\driverlib\cmpss.obj" "Device\driverlib\cputimer.obj" "Device\driverlib\dac.obj" "Device\driverlib\dcc.obj" "Device\driverlib\dcsm.obj" "Device\driverlib\dma.obj" "Device\driverlib\ecap.obj" "Device\driverlib\emif.obj" 
+	-$(RM) "Device\driverlib\epwm.obj" "Device\driverlib\eqep.obj" "Device\driverlib\erad.obj" "Device\driverlib\escss.obj" "Device\driverlib\flash.obj" "Device\driverlib\fsi.obj" "Device\driverlib\gpio.obj" "Device\driverlib\hrcap.obj" "Device\driverlib\hrpwm.obj" "Device\driverlib\i2c.obj" "Device\driverlib\interrupt.obj" "Device\driverlib\ipc.obj" "Device\driverlib\mcan.obj" "Device\driverlib\mcbsp.obj" "Device\driverlib\memcfg.obj" "Device\driverlib\pmbus.obj" "Device\driverlib\sci.obj" "Device\driverlib\sdfm.obj" "Device\driverlib\spi.obj" "Device\driverlib\sysctl.obj" "Device\driverlib\usb.obj" "Device\driverlib\version.obj" "Device\driverlib\xbar.obj" "Libraries\DCL_Control Source\DCL_DF22_C1.obj" "Libraries\DCL_Control Source\DCL_PI_C4.obj" "My Files\Src\Common_Memmap.obj" "My Files\Src\Control_Variables.obj" "My Files\Src\NPC_Hardware_Setup.obj" "My Files\Src\NPC_Solution.obj" 
+	-$(RM) "Inverter_Side_CPU1_main.d" "Device\Common Sources\device.d" "Device\Common Sources\f2838x_adc.d" "Device\Common Sources\f2838x_cputimers.d" "Device\Common Sources\f2838x_defaultisr.d" "Device\Common Sources\f2838x_dma.d" "Device\Common Sources\f2838x_ecap.d" "Device\Common Sources\f2838x_epwm.d" "Device\Common Sources\f2838x_gpio.d" "Device\Common Sources\f2838x_piectrl.d" "Device\Common Sources\f2838x_pievect.d" "Device\Common Sources\f2838x_sysctrl.d" "Device\Header Sources\f2838x_globalvariabledefs.d" "Device\driverlib\adc.d" "Device\driverlib\asysctl.d" "Device\driverlib\bgcrc.d" "Device\driverlib\can.d" "Device\driverlib\cla.d" "Device\driverlib\clb.d" "Device\driverlib\cmpss.d" "Device\driverlib\cputimer.d" "Device\driverlib\dac.d" "Device\driverlib\dcc.d" "Device\driverlib\dcsm.d" "Device\driverlib\dma.d" "Device\driverlib\ecap.d" "Device\driverlib\emif.d" "Device\driverlib\epwm.d" "Device\driverlib\eqep.d" "Device\driverlib\erad.d" "Device\driverlib\escss.d" "Device\driverlib\flash.d" 
+	-$(RM) "Device\driverlib\fsi.d" "Device\driverlib\gpio.d" "Device\driverlib\hrcap.d" "Device\driverlib\hrpwm.d" "Device\driverlib\i2c.d" "Device\driverlib\interrupt.d" "Device\driverlib\ipc.d" "Device\driverlib\mcan.d" "Device\driverlib\mcbsp.d" "Device\driverlib\memcfg.d" "Device\driverlib\pmbus.d" "Device\driverlib\sci.d" "Device\driverlib\sdfm.d" "Device\driverlib\spi.d" "Device\driverlib\sysctl.d" "Device\driverlib\usb.d" "Device\driverlib\version.d" "Device\driverlib\xbar.d" "My Files\Src\Common_Memmap.d" "My Files\Src\Control_Variables.d" "My Files\Src\NPC_Hardware_Setup.d" "My Files\Src\NPC_Solution.d" 
+	-$(RM) "Device\Common Sources\f2838x_codestartbranch.d" "Device\Common Sources\f2838x_usdelay.d" "Libraries\DCL_Control Source\DCL_DF22_C1.d" "Libraries\DCL_Control Source\DCL_PI_C4.d" 
+	-@echo 'Finished clean'
+	-@echo ' '
+
+.PHONY: all clean dependents
+.SECONDARY:
+
+-include ../makefile.targets
+

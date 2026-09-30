@@ -1,0 +1,12 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+SHELL = cmd.exe
+
+# Add inputs and outputs from these tool invocations to the build variables 
+LIB_SRCS += \
+../Device/Compiler/c28x_fpu_dsp_library.lib \
+../Device/Compiler/c28x_fpu_dsp_library_eabi.lib 
+
+

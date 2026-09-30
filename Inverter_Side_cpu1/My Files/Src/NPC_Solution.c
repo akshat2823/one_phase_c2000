@@ -1,0 +1,1660 @@
+/*
+ * NPC_Solution.c
+ *
+ *  Created on: 17-Jun-2025
+ *      Author: Subhasis Mishra
+ */
+
+
+#include "NPC_solution.h"
+
+volatile Uint16 epwm8_tbprd = 1000U;
+volatile uint16_t syncIN =0U;
+volatile uint16_t oldSyncIN = 0U;
+
+volatile float32_t TempV = 10.0f;
+volatile float32_t TempI = 5.5f;
+volatile float32_t TempPF = 0.97f;
+volatile float32_t TempFreq = 250.0f;
+volatile float32_t TempPreal = 1260.0f;
+
+volatile float32_t dividingFactor = 14.1421356f;
+volatile float32_t dacScalingFactor = (4095.0f / 3.0f);
+volatile float32_t dacOffset = 2048.0f;
+volatile float32_t openLoopGain = 0.06f;
+volatile uint16_t dbRampCounter_DAB = 0;
+volatile uint16_t dbRampCounter_INV = 0;
+
+volatile float32_t gainSlew = 10000.0f;
+
+volatile uint32_t invStart = 0U;
+
+volatile uint32_t DABreadyCounter = 0;
+volatile bool DABreadyFlag = FALSE;
+
+// Testing variables
+float32_t Vsens_grid;
+float32_t Vsens_grid1;
+int check2 = 0;
+float y[2] = {0};
+float alpha = 0.001;
+
+uint16_t LUT_Size =720;
+
+
+uint16_t Vmon_dac_count = 0;
+uint16_t Imon_dac_count = 0;
+
+volatile float x1,x2,y1,y2,m,c;
+volatile float calculated_sin_value;
+volatile float32_t Angle_Step;
+
+DeadBandSeqState DeadBandSeqState_t = DB_STATE_OFF;
+uint16_t InvStartDelayCounter = 0;
+uint16_t InvStopDelayCounter = 0;
+bool systemOff_Flag = FALSE;
+
+volatile POWER_MEAS_SINE_ANALYZER PPA_phaseA;
+
+f32_to_u16 PLL_angle_DAC;
+
+
+//*********************************//
+//******Lode Mode variables********//
+//*********************************//
+
+//CC mode
+float32_t phase_angle;
+SPLL_1PH_SOGI V_line_pll;
+SPLL_1PH_SOGI sogi_Ia;
+float32_t Id_ref = 0.0f, Iq_ref = 0.0f;
+float32_t i_alpha = 0.0f, i_beta = 0.0f;
+float32_t Id_fb  = 0.0f, Iq_fb  = 0.0f;
+float32_t ud_inv = 0.0f, uq_inv = 0.0f;
+float32_t alpha_ref = 0.0f;
+float32_t kpI_test = 1.0f, kiI_test = 1000.0f, woI_test, wrcI_test = 0.00628f;
+
+float32_t Iset_dc;
+
+/***********************************************
+ ******Analog Prgramming & Monitoring Variables
+ ***********************************************
+ */
+
+float32_t Vmon_5, Vmon_10, Imon_5, Imon_10;
+float32_t Vpgm_sns, Ipgm_sns;
+
+
+float32_t Vpgm_10, Ipgm_10;
+
+//****************************************************************************************************************************\\
+//*********************************************************** Global Variables*************************************************\\
+//*****************************************************************************************************************************\\
+
+float32_t uk_kp = 0.0599999987f; //0.004567875851731f; //0.007542758915403f; //0.0125000002;
+float32_t uk_ki = 0.00499999989f; //0.001033f; //0.0009478510398571098f; //9.98999967e-05;
+float32_t Mff;
+
+float32_t v_h_A[51];
+ float32_t v_h_B[51];
+ float32_t v_h_C[51];
+
+ float32_t Harm_angle_A[51];
+  float32_t Harm_angle_B[51];
+  float32_t Harm_angle_C[51];
+
+  float32_t Ph_angle_B;
+   float32_t Ph_angle_C;
+
+   float32_t h;
+   float32_t f;
+   float32_t g1;
+   float32_t g2;
+
+
+float32_t Vdc_ref;
+//float32_t Vac_fundamental;                                        //*****************
+//float32_t Iac_fundamental;                                        //*****************
+//float32_t VA_fundamental;
+//float32_t VB_fundamental;
+//float32_t VC_fundamental;
+//float32_t IA_fundamental;
+//float32_t IB_fundamental;
+//float32_t IC_fundamental;
+float32_t V_flicker;
+//float32_t Vdc_fb;
+float32_t Vdc_fb_flt;
+float32_t uk_Va;
+float32_t uk_Vb;
+float32_t uk_Vb1;
+float32_t uk_Vb2;
+float32_t uk_Vc;
+float32_t uk_Va1,uk_Va2,uk_Va3,uk_Va4,uk_Va5;
+float32_t uk_Vb1,uk_Vb2,uk_Vb3,uk_Vb4,uk_Vb5;
+float32_t uk_Vc1,uk_Vc2,uk_Vc3,uk_Vc4,uk_Vc5;
+float32_t uk_Ia;
+float32_t uk_Ib;
+float32_t uk_Ic;
+float32_t uk_Ia1,uk_Ia2,uk_Ia3,uk_Ia4,uk_Ia5;
+float32_t uk_Ib1,uk_Ib2,uk_Ib3,uk_Ib4,uk_Ib5;
+float32_t uk_Ic1,uk_Ic2,uk_Ic3,uk_Ic4,uk_Ic5;
+float32_t sine;
+float32_t cosine;
+float32_t sine_A_pll;
+float32_t sine_B_pll;
+float32_t sine_C_pll;
+float32_t sine_AB_pll;
+float32_t sine_A[51];
+float32_t sine_B[51];
+float32_t sine_C[51];
+float32_t sine_Ref_A;
+float32_t sine_Ref_B;
+float32_t sine_Ref_C;
+float32_t sine_Ref_AB;
+float32_t harm_Ref_A;
+float32_t harm_Ref_B;
+float32_t harm_Ref_C;
+float32_t sine_A_prv;
+//float32_t slope_VacRef;
+//float32_t slope_IacRef;
+float32_t Flicker_slope;
+float32_t slope_VdcRef;
+//float32_t slope_FreqRef;
+float32_t slope_AngleRef;
+float32_t cosine_A;
+float32_t cosine_B;
+float32_t cosine_C;
+float32_t pll_ang;
+float32_t pll_ang_A;
+float32_t pll_ang_A_prev;
+
+float32_t pll_ang_B;
+float32_t pll_ang_C;
+float32_t pll_ang_AB;
+float32_t angle_A;
+float32_t angle_B;
+float32_t angle_C;
+float32_t angle_AB;
+float32_t Ma1;
+float32_t Mb1;
+float32_t Mc1;
+volatile float32_t Ma_CV;
+volatile float32_t Ma_CV_abs;
+volatile float32_t Ma_CV_Max;
+volatile float32_t Ma_CC;
+volatile float32_t Ma_CC_abs;
+volatile float32_t Ma_CC_Max;
+volatile float32_t Ma_CV_Peak;
+volatile float32_t Ma_CC_Peak;
+float32_t Ref,Ref_A,Ref_B,Ref_C;
+float32_t Ref_arbitary_A,Ref_arbitary_B,Ref_arbitary_C;
+float32_t ka,kb,kc,kdc1,kdc2,kdc3,kac1,kac2,kac3;
+float32_t Ma_new;
+float32_t Mb_new;
+float32_t Mc_new;
+float32_t Mcm;
+float32_t max_val;
+float32_t min_val;
+float32_t M_alpha;
+float32_t M_beta;
+float32_t Va_fb;
+float32_t Va_fb_old;
+
+float32_t Vb_fb;
+float32_t Vc_fb;
+float32_t Va_fb_pu;
+float32_t Vb_fb_pu;
+float32_t Vc_fb_pu;
+
+float32_t Vac_fb_pu;
+
+float32_t Ia_fb;
+
+
+
+float32_t Ib_fb;
+float32_t Ic_fb;
+
+float32_t Vc1_fb;
+
+
+float32_t Ia_ref;
+
+float32_t scale = 1;
+float32_t Ib_ref;
+float32_t Ic_ref;
+float32_t Va_ref;
+float32_t Vb_ref;
+float32_t Vc_ref;
+float32_t Vdc_ref_A,Vdc_ref_B,Vdc_ref_C;
+float32_t Idc_ref_A,Idc_ref_B,Idc_ref_C;
+float32_t Va_ref1,Vb_ref1,Vc_ref1;
+float32_t Ia_ref1,Ib_ref1,Ic_ref1;
+float32_t err_VA;
+float32_t err_VB;
+float32_t err_VC;
+float32_t err_IA;
+float32_t err_IB;
+float32_t err_IC;
+float32_t vc1_fb;
+float32_t vc2_fb;
+float32_t Va_fb_prev;
+float32_t Vb_fb_prev;
+float32_t Vc_fb_prev;
+float32_t VdcRefSlewed;
+float32_t ImaxRefSlewed;
+float32_t VacRefSlewed;
+float32_t VA_RefSlewed;
+float32_t VB_RefSlewed;
+float32_t VC_RefSlewed;
+float32_t Vdc_RefSlewed;
+float32_t IA_RefSlewed;
+float32_t IB_RefSlewed;
+float32_t IC_RefSlewed;
+float32_t Idc_RefSlewed;
+float32_t vc1_fb_flt;
+float32_t vc2_fb_flt;
+float32_t vdc_fb_flt;
+float32_t TEMP_A_fb;
+float32_t Va_sns;
+
+float32_t Va_sns1;
+float32_t Va_sns2;
+
+float32_t Vb_sns;
+float32_t Vc_sns;
+float32_t Ia_sns;
+float32_t Ib_sns;
+float32_t Ic_sns;
+float32_t Ia_sns_flt;
+float32_t Ib_sns_flt;
+float32_t Ic_sns_flt;
+float32_t Vc1_sns;
+float32_t Vc2_sns;
+float32_t TEMP_A_sense;
+uint32_t dutyA_S1_Ref;
+uint32_t dutyA_S2_Ref;
+uint32_t dutyB_S1_Ref;
+uint32_t dutyB_S2_Ref;
+uint32_t dutyC_S1_Ref;
+uint32_t dutyC_S2_Ref;
+uint32_t dutyN_S1_Ref;
+uint32_t dutyE_S1_Ref;                                  // Newly added variables for 3 bridge project
+uint32_t dutyF_S1_Ref;                                  // Newly added variables for 3 bridge project  {need to transfer during code transfer]
+
+float32_t DeadBand_INV;
+float32_t DeadBand_DAB;
+float32_t DeadBand;
+float32_t duty_fan1;
+//volatile int32_t StartPowerStage;
+volatile int32_t clearPWMTrips;
+volatile int32_t close_CurrentLoop;
+volatile int32_t close_VoltageLoop;
+volatile int32_t CC_Flag;
+volatile int32_t CV_Flag;
+
+//volatile int32_t OutputMode;
+
+
+
+volatile int32_t firstTimeVoltageLoop;
+volatile int32_t AC_OverVoltage_Trip;
+volatile int32_t AC_UnderVoltage_Trip;
+volatile int32_t PFC_voltage_check;
+volatile int32_t PFC_RDY;
+volatile int32_t test_variable;
+volatile int16_t startFault_VoltageDip ;
+volatile int16_t startFault_FreqVary;
+volatile int16_t startFault_Flicker;
+volatile int16_t start_fault_timer;
+float32_t fault_timer;
+volatile int32_t test_variable;
+int32_t Relay_state;
+int32_t OverCurrent_Flag;
+float32_t FAN_FB_PRD;
+float32_t FAN_SPEED;
+//volatile float32_t AC_Freq_Ref;                                 //*******************
+//volatile float32_t AC_Freq_Ref_A;
+//volatile float32_t AC_Freq_Ref_B;
+//volatile float32_t AC_Freq_Ref_C;
+volatile float32_t Angle_Ref_A;
+volatile float32_t Angle_Ref_B;
+volatile float32_t Angle_Ref_C;
+volatile float32_t Grid_max_freq;
+volatile float32_t Grid_min_freq;
+
+
+
+//volatile float32_t VAR_Freq_Ref_C;
+//volatile float32_t VAR_Freq_Ref_B;
+//volatile float32_t VAR_Freq_Ref_A;
+//
+//power measurement related
+//
+//POWER_MEAS_SINE_ANALYZER Phase_A;
+//POWER_MEAS_SINE_ANALYZER Phase_B;
+//POWER_MEAS_SINE_ANALYZER Phase_C;
+//POWER_MEAS_SINE_ANALYZER DC_OutPut;
+
+
+
+
+float32_t VGridRms_A;                                          //********************
+float32_t VGridRms_B;                                          //********************
+float32_t VGridRms_C;                                          //********************
+float32_t ICONVRms_A;                                          //********************
+float32_t ICONVRms_B;                                          //********************
+float32_t ICONVRms_C;                                          //********************
+float32_t ICONVRms_N;
+float32_t ICONV_peak_A;
+float32_t ICONV_peak_B;
+float32_t ICONV_peak_C;
+float32_t Imax;
+float32_t Vdc_link;
+float32_t Idc_link;
+
+float32_t gridFreq_Hz_A;
+float32_t gridFreq_Hz_B;
+float32_t gridFreq_Hz_C;                                           //********************
+//float32_t powerRms_A_Watts;                                     //********************
+//float32_t powerRms_B_Watts;                                     //********************
+//float32_t powerRms_C_Watts;                                     //********************
+//float32_t powerRmsTotal_Watts;
+//float32_t poweroutputTotal_Watts;
+//float32_t powerFactor_A;
+//float32_t powerFactor_B;
+//float32_t powerFactor_C;
+float32_t P_out_apparent;
+float32_t effeciency;
+float32_t PPA_FreqAvg;
+
+volatile float32_t activePower;
+volatile float32_t reactivePower;
+volatile float32_t activePowerFilt;
+volatile float32_t reactivePowerFilt;
+volatile int32_t aux_isrTicker,aux_isrTicker1,aux_isrTicker2;
+int16_t vTimer0[4];
+
+
+/*
+ * PI controller instances
+ */
+PI_Custom pi_I_inv = Custom_PI_DEFAULTS;
+PI_Custom pi_Id_inv = Custom_PI_DEFAULTS;
+PI_Custom pi_Iq_inv = Custom_PI_DEFAULTS;
+
+//
+// pr_controller instances
+//
+PR_Custom_DF22 Testg1 = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 Testg2 = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 dutynotch = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 dutynotch1 = Custom_DF22_DEFAULTS;//Testing 1 phase INV
+//PR_Custom_DF22 dutynotch1 = Custom_DF22_DEFAULTS;
+
+// voltage controller PhaseA
+PR_Custom_DF22 gi_pr1_A = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r3_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r5_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r7_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r9_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r11_A = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_lead_lag_A = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 Gcomp_A = Custom_DF22_DEFAULTS;
+
+// voltage controller PhaseB
+PR_Custom_DF22 gi_pr1_B = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r3_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r5_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r7_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r9_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r11_B = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_lead_lag_B = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 Gcomp_B = Custom_DF22_DEFAULTS;
+
+// voltage controller PhaseC
+PR_Custom_DF22 gi_pr1_C = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r3_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r5_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r7_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r9_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_r11_C = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gi_lead_lag_C = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 Gcomp_C = Custom_DF22_DEFAULTS;
+
+
+// current controller PhaseA
+PR_Custom_DF22 gv_pr1_A = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r3_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r5_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r7_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r9_A  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r11_A = Custom_DF22_DEFAULTS;
+// current controller PhaseB
+PR_Custom_DF22 gv_pr1_B = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r3_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r5_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r7_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r9_B  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r11_B = Custom_DF22_DEFAULTS;
+// current controller PhaseC
+PR_Custom_DF22 gv_pr1_C = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r3_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r5_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r7_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r9_C  = Custom_DF22_DEFAULTS;
+PR_Custom_DF22 gv_r11_C = Custom_DF22_DEFAULTS;
+
+// DC Mode
+DCL_PI pi_Va    = PI_DEFAULTS;
+DCL_PI pi_Vb    = PI_DEFAULTS;
+DCL_PI pi_Vc    = PI_DEFAULTS;
+DCL_PI pi_Ia    = PI_DEFAULTS;
+DCL_PI pi_Ib    = PI_DEFAULTS;
+DCL_PI pi_Ic    = PI_DEFAULTS;
+
+
+DQ0_ABC Mabc;
+float32_t Md;
+float32_t Mq;
+//
+// for tuning PR controllers
+//
+// voltage loop coeff
+float32_t kpI_1H;
+float32_t kiI_1H, kiI_3H, kiI_5H = 20.0f, kiI_7H, kiI_9H;
+float32_t woI_1H, woI_3H, woI_5H, woI_7H, woI_9H;
+float32_t wrcI_1H, wrcI_3H, wrcI_5H = 5.0f, wrcI_7H, wrcI_9H;
+// current loop coeff
+float32_t kpV_1H;
+float32_t kiV_1H, kiV_3H, kiV_5H, kiV_7H, kiV_9H;
+float32_t woV_1H, woV_3H, woV_5H, woV_7H, woV_9H;
+float32_t wrcV_1H, wrcV_3H, wrcV_5H, wrcV_7H, wrcV_9H;
+
+//
+// Transformation & PLL instances
+//
+SPLL_1PH_SOGI spll_A;
+SPLL_1PH_SOGI spll_B;
+SPLL_1PH_SOGI spll_C;
+
+SPLL_1PH_SOGI spll_line;
+//
+//Reference slew related
+//
+Ref_Slew_Ramp VA_RefSlewRamp;
+Ref_Slew_Ramp VB_RefSlewRamp;
+Ref_Slew_Ramp VC_RefSlewRamp;
+Ref_Slew_Ramp VacRefSlewRamp;
+Ref_Slew_Ramp IacRefSlewRamp;
+Ref_Slew_Ramp IA_RefSlewRamp;
+Ref_Slew_Ramp IB_RefSlewRamp;
+Ref_Slew_Ramp IC_RefSlewRamp;
+Ref_Slew_Ramp Idc_RefSlewRamp;
+Ref_Slew_Ramp VdcRefSlewRamp;
+Ref_Slew_Ramp FreqRefSlewRamp;
+Ref_Slew_Ramp FreqRefSlewRamp_A;
+Ref_Slew_Ramp FreqRefSlewRamp_B;
+Ref_Slew_Ramp FreqRefSlewRamp_C;
+Ref_Slew_Ramp AngleRefSlewRamp_A;
+Ref_Slew_Ramp AngleRefSlewRamp_B;
+Ref_Slew_Ramp AngleRefSlewRamp_C;
+Ref_Slew_Ramp FlickerRefSlewRamp;
+Ref_Slew_Ramp FreqRefSlewRamp_arbitary_wave;
+Ref_Slew_Ramp FreqRefSlewRamp_arbitary_wave_A;
+Ref_Slew_Ramp FreqRefSlewRamp_arbitary_wave_B;
+Ref_Slew_Ramp FreqRefSlewRamp_arbitary_wave_C;
+//
+//internal Ramp generation
+//
+RAMP theta;
+RAMP theta_A;
+RAMP theta_B;
+RAMP theta_C;
+RAMP theta_flicker;
+// arbitary waveform
+RAMP theta_arbitary_wave;
+RAMP theta_arbitary_wave_A;
+RAMP theta_arbitary_wave_B;
+RAMP theta_arbitary_wave_C;
+
+RAMP_NEG sawtooth_neg;
+RAMP_NEG sawtooth_neg_A;
+RAMP_NEG sawtooth_neg_B;
+RAMP_NEG sawtooth_neg_C;
+
+//
+//Auto start related
+//
+NPC_systemState NPC_system_state;
+
+//
+//Notch filter instances
+//
+
+DCL_DF22 NPC_notch_A1,NPC_notch_A2,NPC_notch_A3,NPC_notch_A4,NPC_notch_A5,NPC_notch_A6,NPC_notch_A7,NPC_notch_A8,NPC_notch_A9,NPC_notch_A10;
+DCL_DF22 NPC_notch_A11,NPC_notch_A12,NPC_notch_A13,NPC_notch_A14,NPC_notch_A15,NPC_notch_A16,NPC_notch_A17,NPC_notch_A18,NPC_notch_A19,NPC_notch_A20;
+
+float32_t Notch_freq = 10000.0f;
+
+DCL_DF22 NPC_notch_B1,NPC_notch_B2,NPC_notch_B3,NPC_notch_B4,NPC_notch_B5,NPC_notch_B6,NPC_notch_B7,NPC_notch_B8,NPC_notch_B9,NPC_notch_B10;
+DCL_DF22 NPC_notch_B11,NPC_notch_B12,NPC_notch_B13,NPC_notch_B14,NPC_notch_B15,NPC_notch_B16,NPC_notch_B17,NPC_notch_B18,NPC_notch_B19,NPC_notch_B20;
+
+DCL_DF22 NPC_notch_C1,NPC_notch_C2,NPC_notch_C3,NPC_notch_C4,NPC_notch_C5,NPC_notch_C6,NPC_notch_C7,NPC_notch_C8,NPC_notch_C9,NPC_notch_C10;
+DCL_DF22 NPC_notch_C11,NPC_notch_C12,NPC_notch_C13,NPC_notch_C14,NPC_notch_C15,NPC_notch_C16,NPC_notch_C17,NPC_notch_C18,NPC_notch_C19,NPC_notch_C20;
+
+
+float32_t A_h[1];
+float32_t v_h[51];
+
+DCL_DF22 NPC_notch_A_arb_freq,NPC_notch_B_arb_freq,NPC_notch_C_arb_freq;
+
+// zeta 1,2 for notch or PR
+float32_t zeta1;
+float32_t zeta2;
+
+//fan
+float32_t current_flt;
+float32_t duty_fan;
+
+//
+// programmable impedence
+//
+float32_t Za_va,Za_vb,Za_vc;
+float32_t Za_Ia,Za_Ib,Za_Ic;
+
+float32_t sine_arbitary_A,sine_arbitary_B,sine_arbitary_C;
+volatile float32_t clip_A,clip_B,clip_C;
+
+
+float32_t Vgrid_Sense_scaling = 0.4369f, Vgrid_sense_offset_A = -987.2f;
+
+//float32_t Vgrid_Sense_scaling = 1.0f, Vgrid_sense_offset_A = 2251.0f;
+
+
+
+
+//
+//PRcontrollerCoeff
+//
+void computeDF22_PRcontrollerCoeff_1(PR_Custom_DF22 *v, float32_t kp, float32_t ki,
+                                   float32_t wo, float32_t fs, float32_t wrc)
+{
+    float32_t temp1, temp2, wo_adjusted;
+    wo_adjusted = 2.0f*fs*tanf(wo/(2.0f*fs));
+
+    temp1 = 4.0f*fs*fs+wo_adjusted*wo_adjusted+4.0f*fs*wrc;
+    temp2 = 4.0f*ki*wrc*fs/temp1;
+    v->b0 = temp2;
+    v->b1 = 0;
+    v->b2=-temp2;
+    v->a1=((-8.0f*fs*fs+2*wo_adjusted*wo_adjusted)/temp1);
+    v->a2=((temp1-8.0f*fs*wrc)/temp1);
+    v->x1 = 0;
+    v->x2 = 0;
+
+    if(kp!=0)
+    {
+        v->b0+=kp;
+        v->b1+=kp*v->a1;
+        v->b2+=kp*v->a2;
+    }
+
+    v->a1=(v->a1);
+    v->a2=(v->a2);
+}
+
+void computeDF22_PRcontrollerCoeff_2(PR_Custom_DF22 *v, float32_t kp, float32_t ki,
+                                   float32_t wo, float32_t fs, float32_t wrc)
+{
+    float32_t temp1, temp2, wo_adjusted;
+    wo_adjusted = 2.0f*fs*tanf(wo/(2.0f*fs));
+
+    temp1 = 4.0f*fs*fs+wo_adjusted*wo_adjusted+4.0f*fs*wrc;
+    temp2 = 4.0f*ki*wrc*fs/temp1;
+    v->b0 = temp2;
+    v->b1 = 0;
+    v->b2=-temp2;
+    v->a1=((-8.0f*fs*fs+2*wo_adjusted*wo_adjusted)/temp1);
+    v->a2=((temp1-8.0f*fs*wrc)/temp1);
+//    v->x1 = 0;
+//    v->x2 = 0;
+
+    if(kp!=0)
+    {
+        v->b0+=kp;
+        v->b1+=kp*v->a1;
+        v->b2+=kp*v->a2;
+    }
+
+    v->a1=(v->a1);
+    v->a2=(v->a2);
+}
+
+
+
+
+//
+//Notch filter coeff computation
+//
+void NPC_computeNotchFltrCoeff(PR_Custom_DF22 *coeff, float32_t Fs, float32_t notch_freq,
+                           float32_t c1, float32_t c2)
+{
+    float32_t temp1;
+    float32_t temp2;
+    float32_t wn2;
+    float32_t Ts;
+    Ts = 1 / Fs;
+
+    //
+    // pre warp the notch frequency
+    //
+    wn2 = 2 * Fs * tanf(notch_freq * PI * Ts);
+
+    temp1 = 4 * Fs * Fs + 4 * wn2 * c2 * Fs + wn2 * wn2;
+    temp2 = 1 / ( 4 * Fs * Fs + 4 * wn2 * c1 * Fs + wn2 * wn2);
+
+    coeff->b0 = temp1 * temp2;
+    coeff->b1 = (-8 * Fs * Fs + 2 * wn2 * wn2) * temp2;
+    coeff->b2 = (4 * Fs * Fs - 4 * wn2 * c2 * Fs + wn2 * wn2) * temp2;
+    coeff->a1 = (-8 * Fs * Fs + 2 * wn2 * wn2) * temp2;
+    coeff->a2 = (4 * Fs * Fs - 4 * wn2 * c1 * Fs + wn2 * wn2) * temp2;
+}
+
+// INITIALIZING THE VARIABLE USED IN THE 4Leg INV.
+void NPC_globalVariablesInit(void)
+{
+//
+// initialize PR controller variables
+//
+
+    handshake = 0;
+    handshake_flag = FALSE;
+
+#if mode1 == GE_AC
+    #if AC_submode == Normal //ACFaults
+      // initialize AC voltage controller variables // ALL THE VALUES ARE DEFINED IN PROJECT_DEFINE.H
+
+        //FUNDAMENTAL
+           kpI_1H = KPI_1H;
+           kiI_1H = KII_1H;
+           wrcI_1H= WRCI_1H;
+           woI_1H = 2.0*PI*AC_FREQ_HZ;
+           computeDF22_PRcontrollerCoeff(&gi_pr1_A, kpI_1H,kiI_1H,woI_1H,
+                                         ISR_FREQUENCY,wrcI_1H);
+#if CONVERTER_TYPE == THREE_PHASE
+           computeDF22_PRcontrollerCoeff(&gi_pr1_B, kpI_1H,kiI_1H,woI_1H,
+                                         ISR_FREQUENCY,wrcI_1H);
+           computeDF22_PRcontrollerCoeff(&gi_pr1_C, kpI_1H,kiI_1H,woI_1H,
+                                         ISR_FREQUENCY,wrcI_1H);
+#else
+#endif
+           // THIRD HARMONIC
+           kiI_3H = KII_3H;
+           wrcI_3H = WRCI_3H;
+           woI_3H = 2.0*PI*AC_FREQ_HZ*3;
+           computeDF22_PRcontrollerCoeff(&gi_r3_A, 0,kiI_3H,woI_3H,
+                                         ISR_FREQUENCY,wrcI_3H);
+#if CONVERTER_TYPE == THREE_PHASE
+           computeDF22_PRcontrollerCoeff(&gi_r3_B, 0,kiI_3H,woI_3H,
+                                         ISR_FREQUENCY,wrcI_3H);
+           computeDF22_PRcontrollerCoeff(&gi_r3_C, 0,kiI_3H,woI_3H,
+                                         ISR_FREQUENCY,wrcI_3H);
+#else
+#endif
+           // 5th HARMONIC
+           kiI_5H = KII_5H;
+           wrcI_5H = WRCI_5H;
+           woI_5H = 2.0*PI*AC_FREQ_HZ*5;
+           computeDF22_PRcontrollerCoeff(&gi_r5_A, 0,kiI_5H,woI_5H,
+                                         ISR_FREQUENCY,wrcI_5H);
+#if CONVERTER_TYPE == THREE_PHASE
+           computeDF22_PRcontrollerCoeff(&gi_r5_B, 0,kiI_5H,woI_5H,
+                                         ISR_FREQUENCY,wrcI_5H);
+           computeDF22_PRcontrollerCoeff(&gi_r5_C, 0,kiI_5H,woI_5H,
+                                         ISR_FREQUENCY,wrcI_5H);
+#else
+#endif
+           // 7th HARMONIC
+           kiI_7H = KII_7H;
+           wrcI_7H = WRCI_7H;
+           woI_7H = 2.0*PI*AC_FREQ_HZ*7;
+           computeDF22_PRcontrollerCoeff(&gi_r7_A, 0,kiI_7H,woI_7H,
+                                         ISR_FREQUENCY,wrcI_7H);
+#if CONVERTER_TYPE == THREE_PHASE
+           computeDF22_PRcontrollerCoeff(&gi_r7_B, 0,kiI_7H,woI_7H,
+                                         ISR_FREQUENCY,wrcI_7H);
+           computeDF22_PRcontrollerCoeff(&gi_r7_C, 0,kiI_7H,woI_7H,
+                                         ISR_FREQUENCY,wrcI_7H);
+#else
+#endif
+           // 9th HARMONIC
+           kiI_9H = KII_9H;
+           wrcI_9H = WRCI_9H;
+           woI_9H = 2.0*PI*AC_FREQ_HZ*9;
+           computeDF22_PRcontrollerCoeff(&gi_r9_A, 0,kiI_9H,woI_9H,
+                                         ISR_FREQUENCY,wrcI_9H);
+#if CONVERTER_TYPE == THREE_PHASE
+           computeDF22_PRcontrollerCoeff(&gi_r9_B, 0,kiI_9H,woI_9H,
+                                         ISR_FREQUENCY,wrcI_9H);
+           computeDF22_PRcontrollerCoeff(&gi_r9_C, 0,kiI_9H,woI_9H,
+                                         ISR_FREQUENCY,wrcI_9H);
+#else
+#endif
+           // initialize AC current controller variables //
+           kpV_1H = KPI_1H;
+           kiV_1H = KII_1H;
+           wrcV_1H= WRCI_1H;
+           woV_1H = 2.0*PI*AC_FREQ_HZ;
+
+           kiV_3H = KII_3H;
+           wrcV_3H = WRCI_3H;
+           woV_3H = 2.0*PI*AC_FREQ_HZ*3;
+
+           kiV_5H = KII_5H;
+           wrcV_5H = WRCI_5H;
+           woV_5H = 2.0*PI*AC_FREQ_HZ*5;
+
+           kiV_7H = KII_7H;
+           wrcV_7H = WRCI_7H;
+           woV_7H = 2.0*PI*AC_FREQ_HZ*7;
+
+           kiV_9H = KII_9H;
+           wrcV_9H = WRCI_9H;
+           woV_9H = 2.0*PI*AC_FREQ_HZ*9;
+
+           //phase A_current
+           computeDF22_PRcontrollerCoeff(&gv_pr1_A, kpV_1H,kiV_1H,woV_1H,
+                                         ISR_FREQUENCY,wrcV_1H);
+           computeDF22_PRcontrollerCoeff(&gv_r3_A, 0,kiV_3H,woV_3H,
+                                         ISR_FREQUENCY,wrcV_3H);
+           computeDF22_PRcontrollerCoeff(&gv_r5_A, 0,kiV_5H,woV_5H,
+                                         ISR_FREQUENCY,wrcV_5H);
+           computeDF22_PRcontrollerCoeff(&gv_r7_A, 0,kiV_7H,woV_7H,
+                                         ISR_FREQUENCY,wrcV_7H);
+           computeDF22_PRcontrollerCoeff(&gv_r9_A, 0,kiV_9H,woV_9H,
+                                         ISR_FREQUENCY,wrcV_9H);
+#if CONVERTER_TYPE == THREE_PHASE
+           //phase B_current
+           computeDF22_PRcontrollerCoeff(&gv_pr1_B, kpV_1H,kiV_1H,woV_1H,
+                                         ISR_FREQUENCY,wrcV_1H);
+           computeDF22_PRcontrollerCoeff(&gv_r3_B, 0,kiV_3H,woV_3H,
+                                         ISR_FREQUENCY,wrcV_3H);
+           computeDF22_PRcontrollerCoeff(&gv_r5_B, 0,kiV_5H,woV_5H,
+                                         ISR_FREQUENCY,wrcV_5H);
+           computeDF22_PRcontrollerCoeff(&gv_r7_B, 0,kiV_7H,woV_7H,
+                                         ISR_FREQUENCY,wrcV_7H);
+           computeDF22_PRcontrollerCoeff(&gv_r9_B, 0,kiV_9H,woV_9H,
+                                         ISR_FREQUENCY,wrcV_9H);
+           //phase C_current
+           computeDF22_PRcontrollerCoeff(&gv_pr1_C, kpV_1H,kiV_1H,woV_1H,
+                                         ISR_FREQUENCY,wrcV_1H);
+           computeDF22_PRcontrollerCoeff(&gv_r3_C, 0,kiV_3H,woV_3H,
+                                         ISR_FREQUENCY,wrcV_3H);
+           computeDF22_PRcontrollerCoeff(&gv_r5_C, 0,kiV_5H,woV_5H,
+                                         ISR_FREQUENCY,wrcV_5H);
+           computeDF22_PRcontrollerCoeff(&gv_r7_C, 0,kiV_7H,woV_7H,
+                                         ISR_FREQUENCY,wrcV_7H);
+           computeDF22_PRcontrollerCoeff(&gv_r9_C, 0,kiV_9H,woV_9H,
+                                         ISR_FREQUENCY,wrcV_9H);
+#else
+#endif
+    #else
+    #endif
+#else
+#endif
+
+       //  PR controller initialization forr voltage loop Testing H bridge//
+//           kpI_1H = KPV_1H;
+//           kiI_1H = KIV_1H;
+//           wrcI_1H= WRCV_1H;
+//           woI_1H = 2.0*PI*AC_FREQ_HZ;
+//           computeDF22_PRcontrollerCoeff_1(&Testg1, kpI_1H,kiI_1H,woI_1H,
+//                                         ISR_FREQUENCY,wrcI_1H);
+           computeDF22_PRcontrollerCoeff_1(&Testg2, 0.97f,20.0f,5338.0f,
+                                                   ISR_FREQUENCY,10.0f);
+  //         NPC_computeNotchFltrCoeff(&dutynotch,ISR_FREQUENCY,1020.0f ,0.01f, 0.1f);
+        //   NPC_computeNotchFltrCoeff(&dutynotch1,ISR_FREQUENCY,60.0f ,0.0001f, 0.8f);
+
+           //
+           // DC mode
+           //
+           pi_Va.Kp   =  GI_PI_kp_V;
+           pi_Va.Ki   =  GI_PI_ki_V;
+           pi_Va.Umax =  GI_PI_MAX_V;
+           pi_Va.Umin =  GI_PI_MIN_V;
+
+           pi_Ia.Kp   =  GI_PI_kp_I;
+           pi_Ia.Ki   =  GI_PI_ki_I;
+           pi_Ia.Umax =  GI_PI_MAX_I;
+           pi_Ia.Umin =  GI_PI_MIN_I;
+
+           /*
+            * PI controller for loadMode
+            */
+//           pi_I_inv.Kp   = uk_kp; //GI_PI_kp_loadMode;
+//           pi_I_inv.Ki   = uk_ki; //GI_PI_ki_loadMode;
+           pi_I_inv.Umax = GI_PI_MAX_loadMode;
+           pi_I_inv.Umin = GI_PI_MIN_loadMode;
+
+
+#if CONVERTER_TYPE == THREE_PHASE
+           pi_Vb.Kp   =  GI_PI_kp_V;
+           pi_Vb.Ki   =  GI_PI_ki_V;
+           pi_Vb.Umax =  GI_PI_MAX_V;
+           pi_Vb.Umin =  GI_PI_MIN_V;
+
+           pi_Ib.Kp   =  GI_PI_kp_I;
+           pi_Ib.Ki   =  GI_PI_ki_I;
+           pi_Ib.Umax =  GI_PI_MAX_I;
+           pi_Ib.Umin =  GI_PI_MIN_I;
+
+           pi_Vc.Kp   =  GI_PI_kp_V;
+           pi_Vc.Ki   =  GI_PI_ki_V;
+           pi_Vc.Umax =  GI_PI_MAX_V;
+           pi_Vc.Umin =  GI_PI_MIN_V;
+
+           pi_Ic.Kp   =  GI_PI_kp_I;
+           pi_Ic.Ki   =  GI_PI_ki_I;
+           pi_Ic.Umax =  GI_PI_MAX_I;
+           pi_Ic.Umin =  GI_PI_MIN_I;
+#else
+#endif
+
+     // initialize power analyzer
+//           POWER_MEAS_SINE_ANALYZER_reset(&Phase_A);
+//           POWER_MEAS_SINE_ANALYZER_config(&Phase_A,
+//                                           ISR2_FREQUENCY_HZ,
+//                                           (float32_t)0.05f,
+//                                           (float32_t)GRID_MAX_FREQ,
+//                                           (float32_t)GRID_MIN_FREQ);
+//#if CONVERTER_TYPE == THREE_PHASE
+//           POWER_MEAS_SINE_ANALYZER_reset(&Phase_B);
+//           POWER_MEAS_SINE_ANALYZER_config(&Phase_B,
+//                                           ISR2_FREQUENCY_HZ,
+//                                           (float32_t)0.05f,
+//                                           (float32_t)GRID_MAX_FREQ,
+//                                           (float32_t)GRID_MIN_FREQ);
+//           POWER_MEAS_SINE_ANALYZER_reset(&Phase_C);
+//           POWER_MEAS_SINE_ANALYZER_config(&Phase_C,
+//                                           ISR2_FREQUENCY_HZ,
+//                                           (float32_t)0.05f,
+//                                           (float32_t)GRID_MAX_FREQ,
+//                                           (float32_t)GRID_MIN_FREQ);
+//#else
+//#endif
+
+
+
+
+
+
+        // Initialize system state FOR AUTO-START OF THE INVERTER STAGE.
+           NPC_system_state.enum_systemState = systemState_normalOperation;//systemState_InverterON;//systemState_waitForDCVoltage;
+
+        /***************************************************
+         * *************************************************
+         * SPLL 1ph SOGI Method initialization for load Mode
+         * *************************************************
+         ***************************************************/
+
+           SPLL_1PH_SOGI_reset(&spll_line);
+           SPLL_1PH_SOGI_config(&spll_line, AC_FREQ_HZ, ISR_FREQUENCY, (float32_t)(222.2862), (float32_t)(-222.034));
+
+           //
+           // SPLL 1ph SOGI Method initialization
+           //
+           SPLL_1PH_SOGI_reset(&spll_A);
+           SPLL_1PH_SOGI_config(&spll_A,
+                                AC_FREQ_HZ,
+                                ISR_FREQUENCY,
+                                (float32_t) 166.9743385,
+                                (float32_t) -166.2661165);
+           SPLL_1PH_SOGI_coeff_calc(&spll_A);
+
+#if CONVERTER_TYPE == THREE_PHASE
+
+           SPLL_1PH_SOGI_reset(&spll_B);
+           SPLL_1PH_SOGI_config(&spll_B,
+                                AC_FREQ_HZ,
+                                ISR_FREQUENCY,
+                                (float32_t) 166.9743385,
+                                (float32_t) -166.2661165);
+           SPLL_1PH_SOGI_coeff_calc(&spll_B);
+
+           SPLL_1PH_SOGI_reset(&spll_C);
+           SPLL_1PH_SOGI_config(&spll_C,
+                                AC_FREQ_HZ,
+                                ISR_FREQUENCY,
+                                (float32_t) 166.9743385,
+                                (float32_t) -166.2661165);
+           SPLL_1PH_SOGI_coeff_calc(&spll_C);
+
+#else
+#endif
+
+           //
+           // RAMPGEN initialization
+           //
+           RAMP_reset(&theta);
+           RAMP_reset(&theta_A);
+           REFslew_reset(&VA_RefSlewRamp);
+           REFslew_reset(&IacRefSlewRamp);
+           REFslew_reset(&IA_RefSlewRamp);
+           REFslew_reset(&VdcRefSlewRamp);
+           REFslew_reset(&FreqRefSlewRamp);
+           REFslew_reset(&FreqRefSlewRamp_A);
+           REFslew_reset(&AngleRefSlewRamp_A);
+           REFslew_reset(&FlickerRefSlewRamp);
+           REFslew_config(&VacRefSlewRamp,Vac_Ref,VacRefSlope);
+           REFslew_config(&VA_RefSlewRamp,Vac_Ref,VacRefSlope);
+           REFslew_config(&IA_RefSlewRamp,Imax_Ref,IacRefSlope);
+           REFslew_config(&FlickerRefSlewRamp,0,0);
+           // arbitary wave
+            REFslew_reset(&FreqRefSlewRamp_arbitary_wave);
+            REFslew_reset(&FreqRefSlewRamp_arbitary_wave_A);
+            RAMP_reset(&theta_arbitary_wave);
+            RAMP_reset(&theta_arbitary_wave_A);
+            RAMP_NEG_reset(&sawtooth_neg);
+            RAMP_NEG_reset(&sawtooth_neg_A);
+
+            //
+            //set DeadBand to Max value
+            //
+//            DeadBand = DeadBandMax;
+            DeadBand_INV = DeadBandMax;
+            DeadBand_DAB = DeadBandMax;
+            //
+            //controller Initialization
+            //
+//            StartPowerStage      = 0;
+            StartPowerStage      = 0;
+            StartPowerStage_prev = 0;
+            StartPowerStage_Harm = 0;
+            StartPowerStage_Harm_prev = 0;
+
+            clearPWMTrips        = 0;
+            close_CurrentLoop    = 0;
+            close_VoltageLoop    = 0;
+            firstTimeVoltageLoop = 0;
+            aux_isrTicker        = 0;
+            PFC_RDY              = 0;
+            test_variable        = 0;
+
+#if CONVERTER_TYPE == THREE_PHASE
+
+           RAMP_reset(&theta_B);
+           RAMP_reset(&theta_C);
+           RAMP_reset(&theta_flicker);
+
+           REFslew_reset(&VB_RefSlewRamp);
+           REFslew_reset(&VC_RefSlewRamp);
+           REFslew_reset(&VacRefSlewRamp);
+
+           REFslew_reset(&IB_RefSlewRamp);
+           REFslew_reset(&IC_RefSlewRamp);
+
+           REFslew_reset(&FreqRefSlewRamp_B);
+           REFslew_reset(&FreqRefSlewRamp_C);
+
+           REFslew_reset(&AngleRefSlewRamp_B);
+           REFslew_reset(&AngleRefSlewRamp_C);
+
+           REFslew_config(&VB_RefSlewRamp,Vac_Ref,VacRefSlope);
+           REFslew_config(&VC_RefSlewRamp,Vac_Ref,VacRefSlope);
+
+           REFslew_config(&IB_RefSlewRamp,Imax_Ref,IacRefSlope);
+           REFslew_config(&IC_RefSlewRamp,Imax_Ref,IacRefSlope);
+
+           // arbitary wave
+           REFslew_reset(&FreqRefSlewRamp_arbitary_wave_B);
+           REFslew_reset(&FreqRefSlewRamp_arbitary_wave_C);
+
+            RAMP_reset(&theta_arbitary_wave_B);
+            RAMP_reset(&theta_arbitary_wave_C);
+
+            RAMP_NEG_reset(&sawtooth_neg_B);
+            RAMP_NEG_reset(&sawtooth_neg_C);
+
+#else
+#endif
+           //
+           //initialize AC frequency
+           //
+
+           /*
+#if AC_submode == NormalOperation //|| Arbitrary_waveform_mode
+           AC_Freq_Ref          = arbitary_frequency_A;
+           AC_Freq_Ref_A        = arbitary_frequency_A;
+#if CONVERTER_TYPE == THREE_PHASE
+           AC_Freq_Ref_B        = arbitary_frequency_B;
+           AC_Freq_Ref_C        = arbitary_frequency_C;
+#else
+#endif
+
+#else
+           AC_Freq_Ref          = AC_FREQ_HZ;
+           AC_Freq_Ref_A        = AC_FREQ_HZ;
+#if CONVERTER_TYPE == THREE_PHASE
+           AC_Freq_Ref_B        = AC_FREQ_HZ;
+           AC_Freq_Ref_C        = AC_FREQ_HZ;
+#else
+#endif
+#endif
+
+
+#if mode2 == balanced
+           AC_Freq_Ref          = AC_FREQ_HZ;  // used in PLL, power analyser ..
+           AC_Freq_Ref_A        = arbitary_frequency_A;  // used in notch controller
+#if CONVERTER_TYPE == THREE_PHASE
+           AC_Freq_Ref_B        = arbitary_frequency_B;
+           AC_Freq_Ref_C        = arbitary_frequency_C;
+#else
+#endif
+
+#elif mode2 == unbalanced
+           AC_Freq_Ref_A        = arbitary_frequency_A; // used in PLL and notch controller
+#if CONVERTER_TYPE == THREE_PHASE
+           AC_Freq_Ref_B        = arbitary_frequency_B;
+           AC_Freq_Ref_C        = arbitary_frequency_C;
+#else
+#endif
+#else
+#endif
+*/
+#if mode1 == EL_AC
+           Angle_Ref_A          = 0.0f;     //pll_ang_b,c has -120,120 inherently from sogi
+#if CONVERTER_TYPE == THREE_PHASE
+           Angle_Ref_B          = 0.0f;
+           Angle_Ref_C          = 0.0f;
+#else
+#endif
+#else
+           Angle_Ref_A          = 0.0f;
+#if CONVERTER_TYPE == THREE_PHASE
+           Angle_Ref_B          = (float)-120;
+           Angle_Ref_C          = (float) 120;
+#else
+#endif
+#endif
+
+          // StartPowerStage = startpowerstage;
+#if CONVERTER_TYPE == SINGLE_PHASE
+           AC_Freq_Ref = AC_FREQ_HZ;
+//           Vac_fundamental = Vac_Ref;
+           Vac_fundamental = 1.0f;
+
+           //
+           //slope for references
+           //
+           slope_VacRef = 0.001; //VacRefSlope;
+           slope_FreqRef= FreqRefSlope;
+
+           slope_VdcRef = 0.001;
+
+           ON_degree = 0.0f;
+           OFF_degree = 0.0f;
+
+#elif CONVERTER_TYPE == THREE_PHASE
+
+           AC_Freq_Ref_A = AC_FREQ_HZ;
+           Vac_fundamental = Vac_Ref;
+           VA_fundamental = Vac_Ref;
+           Iac_fundamental = Imax_Ref;
+           IA_fundamental = Imax_Ref;
+
+           //
+           //slope for references
+           //
+           slope_VacRef = VacRefSlope;
+           slope_IacRef = IacRefSlope;
+           slope_FreqRef= FreqRefSlope;
+           slope_AngleRef= AngleRefSlope;
+
+           ON_degree_A = 0.0f;
+           OFF_degree_A = 0.0f;
+
+#endif
+
+
+
+           Imax           = (float)(Imax_Ref + 2.0f);
+
+           seq_start = false;
+           uint16_t i,j;
+           for(i = 0; i < 100; i++)
+           {
+               for(j = 0; j < 3; j++)
+               {
+                   seq_table[i][j] = 0.0f;
+               }
+           }
+
+           OverCurrent_Flag = 0;
+           duty_fan1     = 0.40f;
+           current_flt = 0;
+
+           //
+           //initialize Relay state
+           //
+           Relay_state  = 0;
+
+           //
+           //Notch filter coeff computation
+           //
+           // valid upto 400hz 15kw
+           zeta1 = 0.0001f;
+           zeta2 = 0.6f;
+
+           v_h[1] = 1.0f;
+
+
+#if CONVERTER_TYPE == THREE_PHASE
+           AC_Freq_Ref_B = AC_FREQ_HZ;
+           AC_Freq_Ref_C = AC_FREQ_HZ;
+
+           VB_fundamental = Vac_Ref;
+           VC_fundamental = Vac_Ref;
+
+           IB_fundamental = Imax_Ref;
+           IC_fundamental = Imax_Ref;
+
+           OFF_degree_B = 0.0f;
+           OFF_degree_C = 0.0f;
+#else
+#endif
+
+
+           //
+           //A
+           //
+           NPC_notch_A1.x1 = 0.0f;
+           NPC_notch_A1.x2 = 0.0f;
+
+           NPC_notch_A2.x1 = 0.0f;
+           NPC_notch_A2.x2 = 0.0f;
+
+           NPC_notch_A3.x1 = 0.0f;
+           NPC_notch_A3.x2 = 0.0f;
+
+           NPC_notch_A4.x1 = 0.0f;
+           NPC_notch_A4.x2 = 0.0f;
+
+           NPC_notch_A5.x1 = 0.0f;
+           NPC_notch_A5.x2 = 0.0f;
+
+           NPC_notch_A6.x1 = 0.0f;
+           NPC_notch_A6.x2 = 0.0f;
+
+           NPC_notch_A7.x1 = 0.0f;
+           NPC_notch_A7.x2 = 0.0f;
+
+           NPC_notch_A8.x1 = 0.0f;
+           NPC_notch_A8.x2 = 0.0f;
+
+           NPC_notch_A9.x1 = 0.0f;
+           NPC_notch_A9.x2 = 0.0f;
+
+           NPC_notch_A10.x1 = 0.0f;
+           NPC_notch_A10.x2 = 0.0f;
+
+           NPC_notch_A11.x1 = 0.0f;
+           NPC_notch_A11.x2 = 0.0f;
+
+           NPC_notch_A12.x1 = 0.0f;
+           NPC_notch_A12.x2 = 0.0f;
+
+           NPC_notch_A13.x1 = 0.0f;
+           NPC_notch_A13.x2 = 0.0f;
+
+           NPC_notch_A14.x1 = 0.0f;
+           NPC_notch_A14.x2 = 0.0f;
+
+           NPC_notch_A15.x1 = 0.0f;
+           NPC_notch_A15.x2 = 0.0f;
+
+           NPC_notch_A16.x1 = 0.0f;
+           NPC_notch_A16.x2 = 0.0f;
+
+           NPC_notch_A17.x1 = 0.0f;
+           NPC_notch_A17.x2 = 0.0f;
+
+           NPC_notch_A18.x1 = 0.0f;
+           NPC_notch_A18.x2 = 0.0f;
+
+           NPC_notch_A19.x1 = 0.0f;
+           NPC_notch_A19.x2 = 0.0f;
+
+           NPC_notch_A20.x1 = 0.0f;
+           NPC_notch_A20.x2 = 0.0f;
+
+#if CONVERTER_TYPE == THREE_PHASE
+           //
+           //B
+           //
+           NPC_notch_B1.x1 = 0.0f;
+           NPC_notch_B1.x2 = 0.0f;
+
+           NPC_notch_B2.x1 = 0.0f;
+           NPC_notch_B2.x2 = 0.0f;
+
+           NPC_notch_B3.x1 = 0.0f;
+           NPC_notch_B3.x2 = 0.0f;
+
+           NPC_notch_B4.x1 = 0.0f;
+           NPC_notch_B4.x2 = 0.0f;
+
+           NPC_notch_B5.x1 = 0.0f;
+           NPC_notch_B5.x2 = 0.0f;
+
+           NPC_notch_B6.x1 = 0.0f;
+           NPC_notch_B6.x2 = 0.0f;
+
+           NPC_notch_B7.x1 = 0.0f;
+           NPC_notch_B7.x2 = 0.0f;
+
+           NPC_notch_B8.x1 = 0.0f;
+           NPC_notch_B8.x2 = 0.0f;
+
+           NPC_notch_B9.x1 = 0.0f;
+           NPC_notch_B9.x2 = 0.0f;
+
+           NPC_notch_B10.x1 = 0.0f;
+           NPC_notch_B10.x2 = 0.0f;
+
+           NPC_notch_B11.x1 = 0.0f;
+           NPC_notch_B11.x2 = 0.0f;
+
+           NPC_notch_B12.x1 = 0.0f;
+           NPC_notch_B12.x2 = 0.0f;
+
+           NPC_notch_B13.x1 = 0.0f;
+           NPC_notch_B13.x2 = 0.0f;
+
+           NPC_notch_B14.x1 = 0.0f;
+           NPC_notch_B14.x2 = 0.0f;
+
+           NPC_notch_B15.x1 = 0.0f;
+           NPC_notch_B15.x2 = 0.0f;
+
+           NPC_notch_B16.x1 = 0.0f;
+           NPC_notch_B16.x2 = 0.0f;
+
+           NPC_notch_B17.x1 = 0.0f;
+           NPC_notch_B17.x2 = 0.0f;
+
+           NPC_notch_B18.x1 = 0.0f;
+           NPC_notch_B18.x2 = 0.0f;
+
+           NPC_notch_B19.x1 = 0.0f;
+           NPC_notch_B19.x2 = 0.0f;
+
+           NPC_notch_B20.x1 = 0.0f;
+           NPC_notch_B20.x2 = 0.0f;
+
+           //
+           // C
+           //
+
+           NPC_notch_C1.x1 = 0.0f;
+           NPC_notch_C1.x2 = 0.0f;
+
+           NPC_notch_C2.x1 = 0.0f;
+           NPC_notch_C2.x2 = 0.0f;
+
+           NPC_notch_C3.x1 = 0.0f;
+           NPC_notch_C3.x2 = 0.0f;
+
+           NPC_notch_C4.x1 = 0.0f;
+           NPC_notch_C4.x2 = 0.0f;
+
+           NPC_notch_C5.x1 = 0.0f;
+           NPC_notch_C5.x2 = 0.0f;
+
+           NPC_notch_C6.x1 = 0.0f;
+           NPC_notch_C6.x2 = 0.0f;
+
+           NPC_notch_C7.x1 = 0.0f;
+           NPC_notch_C7.x2 = 0.0f;
+
+           NPC_notch_C8.x1 = 0.0f;
+           NPC_notch_C8.x2 = 0.0f;
+
+           NPC_notch_C9.x1 = 0.0f;
+           NPC_notch_C9.x2 = 0.0f;
+
+           NPC_notch_C10.x1 = 0.0f;
+           NPC_notch_C10.x2 = 0.0f;
+
+           NPC_notch_C11.x1 = 0.0f;
+           NPC_notch_C11.x2 = 0.0f;
+
+           NPC_notch_C12.x1 = 0.0f;
+           NPC_notch_C12.x2 = 0.0f;
+
+           NPC_notch_C13.x1 = 0.0f;
+           NPC_notch_C13.x2 = 0.0f;
+
+           NPC_notch_C14.x1 = 0.0f;
+           NPC_notch_C14.x2 = 0.0f;
+
+           NPC_notch_C15.x1 = 0.0f;
+           NPC_notch_C15.x2 = 0.0f;
+
+           NPC_notch_C16.x1 = 0.0f;
+           NPC_notch_C16.x2 = 0.0f;
+
+           NPC_notch_C17.x1 = 0.0f;
+           NPC_notch_C17.x2 = 0.0f;
+
+           NPC_notch_C18.x1 = 0.0f;
+           NPC_notch_C18.x2 = 0.0f;
+
+           NPC_notch_C19.x1 = 0.0f;
+           NPC_notch_C19.x2 = 0.0f;
+
+           NPC_notch_C20.x1 = 0.0f;
+           NPC_notch_C20.x2 = 0.0f;
+
+#else
+#endif
+
+
+
+#if mode1 == GE_DC
+    #if DC_submode == Bipolar  // notch  // to avoid resonant freq. oscillations
+                NPC_computeNotchFltrCoeff(&NPC_notch_A_arb_freq,
+                                         (float32_t)(ISR_FREQUENCY),
+                                         (float32_t)(5000) ,
+                                         0.8f,0.0001f);
+
+                NPC_computeNotchFltrCoeff(&NPC_notch_B_arb_freq,
+                                         (float32_t)(ISR_FREQUENCY),
+                                         (float32_t)(5000) ,
+                                         0.8f,0.0001f);
+
+                NPC_computeNotchFltrCoeff(&NPC_notch_C_arb_freq,
+                                         (float32_t)(ISR_FREQUENCY),
+                                         (float32_t)(5000) ,
+                                         0.8f,0.0001f);
+    #else
+    #endif
+
+#elif mode1 == EL_AC    // notch   // to avoid resonant freq. oscillations
+
+                NPC_computeNotchFltrCoeff(&NPC_notch_A_arb_freq,
+                                         (float32_t)(ISR_FREQUENCY),
+                                         (float32_t)(5000) ,
+                                         0.8f,0.0001f);
+
+                NPC_computeNotchFltrCoeff(&NPC_notch_B_arb_freq,
+                                         (float32_t)(ISR_FREQUENCY),
+                                         (float32_t)(5000) ,
+                                         0.8f,0.0001f);
+
+                NPC_computeNotchFltrCoeff(&NPC_notch_C_arb_freq,
+                                         (float32_t)(ISR_FREQUENCY),
+                                         (float32_t)(5000) ,
+                                         0.8f,0.0001f);
+#else
+                // inverse notch
+            NPC_computeNotchFltrCoeff(&NPC_notch_A_arb_freq,
+                                     (float32_t)(ISR_FREQUENCY),
+                                     (float32_t)(arbitary_frequency_A) ,
+                                     0.0001f, 0.8f);
+            NPC_notch_A_arb_freq.x1 = 0.0f;
+            NPC_notch_A_arb_freq.x2 = 0.0f;
+
+#if CONVERTER_TYPE == THREE_PHASE
+            NPC_computeNotchFltrCoeff(&NPC_notch_B_arb_freq,
+                                     (float32_t)(ISR_FREQUENCY),
+                                     (float32_t)(arbitary_frequency_B) ,
+                                     0.0001f, 0.8f);
+            NPC_notch_B_arb_freq.x1 = 0.0f;
+            NPC_notch_B_arb_freq.x2 = 0.0f;
+
+            NPC_computeNotchFltrCoeff(&NPC_notch_C_arb_freq,
+                                     (float32_t)(ISR_FREQUENCY),
+                                     (float32_t)(arbitary_frequency_C) ,
+                                     0.0001f, 0.8f);
+
+            NPC_notch_C_arb_freq.x1 = 0.0f;
+            NPC_notch_C_arb_freq.x2 = 0.0f;
+#else
+#endif
+
+#endif
+
+
+
+            //
+            // programmable_output_impedence
+            //
+#if mode2 == balanced
+            Za_va = Za_v;
+            Za_Ia = Za_I;
+
+#if CONVERTER_TYPE == THREE_PHASE
+            Za_vb = Za_v;
+            Za_Ib = Za_I;
+
+            Za_vc = Za_v;
+            Za_Ic = Za_I;
+#else
+#endif
+
+#elif mode2 == unbalanced
+            Za_va = Za_v;
+            Za_Ia = Za_I;
+
+#if CONVERTER_TYPE == THREE_PHASE
+            Za_vb = Zb_v;
+            Za_Ib = Zb_I;
+
+            Za_vc = Zc_v;
+            Za_Ic = Zc_I;
+
+#else
+#endif
+
+#else
+#endif
+}
+
+// autostart function of inverter
+// THIS WILL CHECK THE STATUS/INITIAL/RUNNING CONDITIONS OF THE INV LIKE OV OC UDV-DC LINK ETC.
+
+// assign intial state of NPC_autoStart_INVERTER in NPC_globalVariablesInit() function
+// intial state is systemState_normalOperation as of now
+
+#if CONVERTER_TYPE == THREE_PHASE
+
+void NPC_autoStart_INVERTER(void)
+{
+switch(NPC_system_state.enum_systemState)
+    {
+        case systemState_waitForDCVoltage :
+            if((vc1_fb_flt > MIN_DCLINK_volt && vc1_fb_flt < MAX_DCLINK_volt)&&
+               (vc2_fb_flt > MIN_DCLINK_volt && vc2_fb_flt < MAX_DCLINK_volt))
+            {
+                NPC_system_state.enum_systemState = systemState_InverterON;
+            }
+            break;
+
+        case systemState_InverterON:
+            if(NPC_HAL_get_INVONOFF_GPIOStatus() == 0)
+            {
+                aux_isrTicker++;
+                if(aux_isrTicker == 100)
+                {
+                    NPC_HAL_TurnOFF_LED2();
+                    NPC_HAL_TurnON_LED1();
+                    StartPowerStage = 1;
+                    NPC_system_state.enum_systemState = systemState_normalOperation;
+                    aux_isrTicker = 0;
+                }
+            }
+            break;
+
+        case systemState_normalOperation:
+
+            /*
+            // inverter on off switch in led card is not working properly so inverter switch logic in led card is by passed
+                if(NPC_HAL_get_INVONOFF_GPIOStatus() == 1)
+                {
+                    NPC_system_state.enum_systemState = systemState_InverterOFF;
+                }
+
+                //
+                // Check for under voltage
+                //
+               if(vc1_fb_flt < MIN_DCLINK_volt ||
+                  vc2_fb_flt < MIN_DCLINK_volt)
+                {
+                    NPC_system_state.enum_systemState = systemState_dclinkundervoltage;
+                }
+
+                //
+                // Check for over voltage
+                //
+                if(vc1_fb_flt > MAX_DCLINK_volt ||
+                   vc2_fb_flt > MAX_DCLINK_volt)
+                {
+                  NPC_system_state.enum_systemState = systemState_dclinkovervoltage;
+
+                }
+                */
+
+                //
+                // Check for Over Current Flag
+                //
+                if(NPC_HAL_check_CMPSS_Flag())
+                {
+                    NPC_system_state.enum_systemState = systemState_INV_Overcurrent;
+                }
+
+                //
+                // Check for DESAT Event
+                //
+//                if(NPC_HAL_getGateDriverDESATGPIOStatus() == 0)
+//                {
+//                    NPC_system_state.enum_systemState = systemState_DESAT;
+//                }
+            break;
+
+        case systemState_dclinkundervoltage:
+            NPC_HAL_ForceOSTEVENTtoALLEPWM();
+            NPC_HAL_Disable_GateDriver();
+            NPC_HAL_TurnON_AC_UV_LED();
+            //NPC_HAL_TurnOFF_LED1();
+            NPC_HAL_TurnON_BLUELED();
+            break;
+
+        case systemState_dclinkovervoltage:
+            NPC_HAL_ForceOSTEVENTtoALLEPWM();
+            NPC_HAL_Disable_GateDriver();
+            NPC_HAL_TurnON_AC_OV_LED();
+            NPC_HAL_TurnOFF_LED1();
+            NPC_HAL_TurnON_BLUELED();
+
+            break;
+
+        case systemState_INV_Overcurrent:
+            NPC_HAL_Disable_GateDriver();
+            NPC_HAL_TurnON_AC_OC_LED();
+            NPC_HAL_TurnOFF_PFC_RDY_LED();
+            NPC_HAL_TurnON_REDLED();
+            NPC_HAL_TurnOFF_LED1();
+            break;
+
+        case systemState_InverterOFF:     // BY RESET SWITCH IN LED CARD
+            NPC_HAL_Disable_GateDriver();
+            NPC_HAL_TurnOFF_LED1();
+            NPC_HAL_TurnON_LED2();
+            if(NPC_HAL_get_INVONOFF_GPIOStatus() == 0)
+            {
+                NPC_Reset_INV();
+                NPC_system_state.enum_systemState = systemState_InverterON;//systemState_waitForDCVoltage
+            }
+            break;
+        case systemState_DESAT:       // RUN IF FAULT PIN FROM GATE DRIVER GOES LOW
+            NPC_HAL_ForceOSTEVENTtoALLEPWM();
+            NPC_HAL_Disable_GateDriver();
+            NPC_HAL_TurnON_DESAT_LED();
+            break;
+    }
+}
+
+#else
+#endif
+
+
+// RESET THE VARIABLES IF POWER CONVERTER IS RESTARTED BY INVERTER ON/OFF SWITCH
+void NPC_Reset_INV(void)
+{
+    RAMP_reset(&theta);
+    RAMP_reset(&theta_A);
+    RAMP_reset(&theta_B);
+    RAMP_reset(&theta_C);
+    RAMP_reset(&theta_flicker);
+
+    REFslew_reset(&VacRefSlewRamp);
+    REFslew_reset(&IacRefSlewRamp);
+    REFslew_reset(&VdcRefSlewRamp);
+
+    REFslew_reset(&FreqRefSlewRamp);
+    REFslew_reset(&FreqRefSlewRamp_A);
+    REFslew_reset(&FreqRefSlewRamp_B);
+    REFslew_reset(&FreqRefSlewRamp_C);
+
+    REFslew_reset(&AngleRefSlewRamp_A);
+    REFslew_reset(&AngleRefSlewRamp_B);
+    REFslew_reset(&AngleRefSlewRamp_C);
+
+    REFslew_reset(&FlickerRefSlewRamp);
+
+    // arbitary wave
+     REFslew_reset(&FreqRefSlewRamp_arbitary_wave);
+     REFslew_reset(&FreqRefSlewRamp_arbitary_wave_A);
+     REFslew_reset(&FreqRefSlewRamp_arbitary_wave_B);
+     REFslew_reset(&FreqRefSlewRamp_arbitary_wave_C);
+
+     RAMP_reset(&theta_arbitary_wave);
+     RAMP_reset(&theta_arbitary_wave_A);
+     RAMP_reset(&theta_arbitary_wave_B);
+     RAMP_reset(&theta_arbitary_wave_C);
+
+     RAMP_NEG_reset(&sawtooth_neg);
+     RAMP_NEG_reset(&sawtooth_neg_A);
+     RAMP_NEG_reset(&sawtooth_neg_B);
+     RAMP_NEG_reset(&sawtooth_neg_C);
+
+
+    StartPowerStage      = 0;
+    clearPWMTrips        = 0;
+    close_CurrentLoop    = 0;
+    close_VoltageLoop    = 0;
+    firstTimeVoltageLoop = 0;
+    aux_isrTicker        = 0;
+    //
+    //set DeadBand to Max value
+    //
+    DeadBand = DeadBandMax;   //   HIGH TO STEADY-STATE VALUE
+
+    //
+    //slope for references
+    //
+#if CONVERTER_TYPE == SINGLE_PHASE
+    slope_VacRef = VacRefSlope;
+    slope_FreqRef= FreqRefSlope;
+
+#elif CONVERTER_TYPE == THREE_PHASE
+    slope_VacRef = VacRefSlope;
+    slope_IacRef = IacRefSlope;
+    slope_FreqRef= FreqRefSlope;
+    slope_AngleRef= AngleRefSlope;
+#endif
+}
+
+
+
