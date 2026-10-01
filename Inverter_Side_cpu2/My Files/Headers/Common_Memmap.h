@@ -20,6 +20,14 @@
 #define SIZE_U32                4
 #define SIZE_U8                 1
 
+#define READ_HARMONIC_FROM_MAIN(n)                                      \
+    do                                                                  \
+    {                                                                   \
+        harm##n##_no  = ReadFloatFromMainBuff(DSP_HARM_NUM(n##U));      \
+        harm##n##_amp = ReadFloatFromMainBuff(DSP_HARM_PERCENT(n##U));      \
+        harm##n##_pha = ReadFloatFromMainBuff(DSP_HARM_PHASE(n##U));    \
+    } while(0)
+
 typedef enum{
     TYPE_FLOAT32,
     TYPE_UINT32
@@ -113,9 +121,8 @@ typedef struct{
 #define DSP_HARM_BASE                           (DSP_HARM_WAVEFORM_NUM + SIZE_U8)
 #define DSP_HARM_ENTRY_SIZE                     (3U * SIZE_FLOAT)
 #define DSP_HARM_NUM(n)                         (DSP_HARM_BASE + (((n) - 1U) * DSP_HARM_ENTRY_SIZE))
-#define DSP_HARM_AMP(n)                         (DSP_HARM_NUM(n) + SIZE_FLOAT)
-#define DSP_HARM_PHASE(n)                       (DSP_HARM_AMP(n) + SIZE_FLOAT)
-
+#define DSP_HARM_PERCENT(n)                     (DSP_HARM_NUM(n) + SIZE_FLOAT)
+#define DSP_HARM_PHASE(n)                       (DSP_HARM_PERCENT(n) + SIZE_FLOAT)
 
 /* ========================================================================
  * Individual harmonic aliases
@@ -386,15 +393,6 @@ typedef struct{
 
 #define DSP_PHASE_ANGLE                         (DSP_OUT_FREQSLEW + SIZE_FLOAT)
 
-#define DSP_STATUS_CLEAR_A                      (DSP_PHASE_ANGLE + SIZE_FLOAT)
-#define DSP_STATUS_CLEAR_B                      (DSP_STATUS_CLEAR_A + SIZE_U32)
-
-#define DSP_SET_END_ADDR                        (DSP_STATUS_CLEAR_B + SIZE_U32)
-#define DSP_VACSLEW                             (DSP_LIM_VDC_MINUS + SIZE_FLOAT)
-#define DSP_VDCSLEW                             (DSP_VACSLEW + SIZE_FLOAT)
-#define DSP_OUT_FREQSLEW                        (DSP_VDCSLEW + SIZE_FLOAT)
-
-#define DSP_PHASE_ANGLE                         (DSP_OUT_FREQSLEW + SIZE_FLOAT)
 #define DSP_STATUS_CLEAR_A                      (DSP_PHASE_ANGLE + SIZE_FLOAT)
 #define DSP_STATUS_CLEAR_B                      (DSP_STATUS_CLEAR_A + SIZE_U32)
 
