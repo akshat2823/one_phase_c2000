@@ -22,6 +22,8 @@
 #include "Ref_Gen.h"
 
 
+
+
 volatile SharedFlags cpu2Write_Flags;
 volatile int cpu2Read_Flag;
 volatile uint16_t cpu2Read[MAX_LENGTH];
@@ -221,21 +223,31 @@ void main(void)
 //        else{}
 //        StartPowerStage_prev = StartPowerStage;
 //**********************************************************************//
-        if((StartPowerStage == 1) && (StartPowerStage_prev == 0))
-        {
+//        if((StartPowerStage == 1U))
+//        {
+            /*
+             * Clear previous harmonic configuration.
+             */
             Harmonic_Array_clear();
-            Harmonic_Array_Init();
-            updateBaseLookUpTable();
-        }
-        else{}
-        StartPowerStage_prev = StartPowerStage;
 
-        if((StartPowerStage_Harm == 1) && (StartPowerStage_Harm_prev == 0))
-        {
+
+            /*
+             * Populate HarmonicA[][] using the latest values
+             * received from the Main MCU.
+             */
+            Load_Received_Harmonics_To_Array();
+
+
+            /*
+             * Generate waveform LUT from the updated harmonic table.
+             */
             updateBaseLookUpTable();
-        }
-        else{}
-        StartPowerStage_Harm_prev = StartPowerStage_Harm;
+//        }
+//        else
+//        {
+//            /* Nothing */
+//        }
+
     }
 }
 

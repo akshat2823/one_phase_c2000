@@ -6,6 +6,17 @@
  */
 
 #include "Ref_Gen.h"
+#include "Control_Variables.h"
+
+#define DEG_TO_RAD                                          (0.01745329251994329577f)
+
+#define LOAD_HARMONIC_A(index, no_var, amp_var, pha_var)     \
+    do                                                       \
+    {                                                        \
+        HarmonicA[(index)][0] = (no_var);                    \
+        HarmonicA[(index)][1] = (amp_var);                   \
+        HarmonicA[(index)][2] = (pha_var) * DEG_TO_RAD;      \
+    } while(0)
 
 void Harmonic_Array_clear(void)
 {
@@ -54,67 +65,167 @@ void Harmonic_Array_Init(void)
 
 void updateBaseLookUpTable(void)
 {
-    uint16_t i, j;
+    uint16_t i;
+    uint16_t j;
 
-    for(i = 0; i < LUT_SIZE; i++)
+    float32_t thetaBase;
+    float32_t harmonicAngle;
+    float32_t resultA;
+    float32_t outA;
+
+
+    for(i = 0U; i < LUT_SIZE; i++)
     {
-        float theta_base = (float)i * Angle_Step;
+        /* Base electrical angle in radians */
+        thetaBase = ((float32_t)i * Angle_Step);
 
-        float ResultA = 0.0f;
-        float ResultB = 0.0f;
-        float ResultC = 0.0f;
+        resultA = 0.0f;
 
-        for(j = 0; j < MAX_HARMONIC_NO; j++)
+
+        /* ================================================================
+         * Add all harmonics
+         * ================================================================ */
+
+        for(j = 0U; j < MAX_HARMONIC_NO; j++)
         {
-            /* Phase A */
-//            float TimeA = (HarmonicA[j][0] * theta_base) + HarmonicA[j][2];
-//            ResultA += sinf(TimeA) * HarmonicA[j][1] * 0.01f;
-
-            if(j == 0)
+            /*
+             * Skip unused harmonic entries.
+             *
+             * harmonic number = 0 means row not used.
+             */
+            if(HarmonicA[j][0] <= 0.0f)
             {
-                float TimeA = (1.0f * theta_base) + HarmonicA[j][2];
-                ResultA += sinf(TimeA) * HarmonicA[j][1] * 0.01f;
-            }
-            else
-            {
-                float TimeA = (HarmonicA[j][0] * theta_base) + HarmonicA[j][2];
-                ResultA += sinf(TimeA) * HarmonicA[j][1] * 0.01f;
+                continue;
             }
 
-//            /* Phase B */
-//            float TimeB = (HarmonicB[j][0] * theta_base) + HarmonicB[j][2];
-//            ResultB += sinf(TimeB) * HarmonicB[j][1];
-//
-//            /* Phase C */
-//            float TimeC = (HarmonicC[j][0] * theta_base) + HarmonicC[j][2];
-//            ResultC += sinf(TimeC) * HarmonicC[j][1];
+
+            /*
+             * Equation:
+             *
+             *      angle = n * theta + phase
+             *
+             * where:
+             *
+             *      n     = harmonic number
+             *      theta = fundamental angle
+             *      phase = harmonic phase in radians
+             */
+            harmonicAngle = (HarmonicA[j][0] * thetaBase)+ HarmonicA[j][2];
+
+
+            /*
+             * Amplitude is stored as percentage.
+             *
+             * Example:
+             *
+             *      100% -> 1.0
+             *       10% -> 0.1
+             *        5% -> 0.05
+             */
+            resultA += sinf(harmonicAngle) * HarmonicA[j][1] * 0.01f;
         }
 
-        /* Scale */
-        float OutA = ResultA * 32767.0f;
-//        float OutB = ResultB * 32767.0f;
-//        float OutC = ResultC * 32767.0f;
 
-        /* Saturate */
-        if(OutA >  32767.0f) OutA =  32767.0f;
-        if(OutA < -32768.0f) OutA = -32768.0f;
+        /* ================================================================
+         * Convert normalized waveform to signed 16-bit LUT
+         * ================================================================ */
 
-//        if(OutB >  32767.0f) OutB =  32767.0f;
-//        if(OutB < -32768.0f) OutB = -32768.0f;
-//
-//        if(OutC >  32767.0f) OutC =  32767.0f;
-//        if(OutC < -32768.0f) OutC = -32768.0f;
+        outA = resultA * 32767.0f;
 
-        /* Store */
-        BaseLUT_A[i] = (signed int)OutA;
-//        BaseLUT_B[i] = (signed int)OutB;
-//        BaseLUT_C[i] = (signed int)OutC;
+
+        /* Saturation */
+        if(outA > 32767.0f)
+        {
+            outA = 32767.0f;
+        }
+        else if(outA < -32768.0f)
+        {
+            outA = -32768.0f;
+        }
+
+
+        BaseLUT_A[i] = (signed int)outA;
     }
 }
+void Load_Received_Harmonics_To_Array(void)
+{
+    /* ================================================================
+     * Harmonic 1
+     *
+     * Keep fundamental explicitly at 100%.
+     *
+     * If you want harmonic-1 amplitude also from MCU,
+     * replace 100.0f with harm1_amp.
+     * ================================================================ */
+
+    HarmonicA[0][0] = harm1_no;
+    HarmonicA[0][1] = 100.0f;
+    HarmonicA[0][2] = harm1_pha;
 
 
+    /* ================================================================
+     * Harmonics 2 ... 50
+     * ================================================================ */
 
+    LOAD_HARMONIC_A(1U,  harm2_no,  harm2_amp,  harm2_pha);
+    LOAD_HARMONIC_A(2U,  harm3_no,  harm3_amp,  harm3_pha);
+    LOAD_HARMONIC_A(3U,  harm4_no,  harm4_amp,  harm4_pha);
+    LOAD_HARMONIC_A(4U,  harm5_no,  harm5_amp,  harm5_pha);
 
+    LOAD_HARMONIC_A(5U,  harm6_no,  harm6_amp,  harm6_pha);
+    LOAD_HARMONIC_A(6U,  harm7_no,  harm7_amp,  harm7_pha);
+    LOAD_HARMONIC_A(7U,  harm8_no,  harm8_amp,  harm8_pha);
+    LOAD_HARMONIC_A(8U,  harm9_no,  harm9_amp,  harm9_pha);
+    LOAD_HARMONIC_A(9U,  harm10_no, harm10_amp, harm10_pha);
+
+    LOAD_HARMONIC_A(10U, harm11_no, harm11_amp, harm11_pha);
+    LOAD_HARMONIC_A(11U, harm12_no, harm12_amp, harm12_pha);
+    LOAD_HARMONIC_A(12U, harm13_no, harm13_amp, harm13_pha);
+    LOAD_HARMONIC_A(13U, harm14_no, harm14_amp, harm14_pha);
+    LOAD_HARMONIC_A(14U, harm15_no, harm15_amp, harm15_pha);
+
+    LOAD_HARMONIC_A(15U, harm16_no, harm16_amp, harm16_pha);
+    LOAD_HARMONIC_A(16U, harm17_no, harm17_amp, harm17_pha);
+    LOAD_HARMONIC_A(17U, harm18_no, harm18_amp, harm18_pha);
+    LOAD_HARMONIC_A(18U, harm19_no, harm19_amp, harm19_pha);
+    LOAD_HARMONIC_A(19U, harm20_no, harm20_amp, harm20_pha);
+
+    LOAD_HARMONIC_A(20U, harm21_no, harm21_amp, harm21_pha);
+    LOAD_HARMONIC_A(21U, harm22_no, harm22_amp, harm22_pha);
+    LOAD_HARMONIC_A(22U, harm23_no, harm23_amp, harm23_pha);
+    LOAD_HARMONIC_A(23U, harm24_no, harm24_amp, harm24_pha);
+    LOAD_HARMONIC_A(24U, harm25_no, harm25_amp, harm25_pha);
+
+    LOAD_HARMONIC_A(25U, harm26_no, harm26_amp, harm26_pha);
+    LOAD_HARMONIC_A(26U, harm27_no, harm27_amp, harm27_pha);
+    LOAD_HARMONIC_A(27U, harm28_no, harm28_amp, harm28_pha);
+    LOAD_HARMONIC_A(28U, harm29_no, harm29_amp, harm29_pha);
+    LOAD_HARMONIC_A(29U, harm30_no, harm30_amp, harm30_pha);
+
+    LOAD_HARMONIC_A(30U, harm31_no, harm31_amp, harm31_pha);
+    LOAD_HARMONIC_A(31U, harm32_no, harm32_amp, harm32_pha);
+    LOAD_HARMONIC_A(32U, harm33_no, harm33_amp, harm33_pha);
+    LOAD_HARMONIC_A(33U, harm34_no, harm34_amp, harm34_pha);
+    LOAD_HARMONIC_A(34U, harm35_no, harm35_amp, harm35_pha);
+
+    LOAD_HARMONIC_A(35U, harm36_no, harm36_amp, harm36_pha);
+    LOAD_HARMONIC_A(36U, harm37_no, harm37_amp, harm37_pha);
+    LOAD_HARMONIC_A(37U, harm38_no, harm38_amp, harm38_pha);
+    LOAD_HARMONIC_A(38U, harm39_no, harm39_amp, harm39_pha);
+    LOAD_HARMONIC_A(39U, harm40_no, harm40_amp, harm40_pha);
+
+    LOAD_HARMONIC_A(40U, harm41_no, harm41_amp, harm41_pha);
+    LOAD_HARMONIC_A(41U, harm42_no, harm42_amp, harm42_pha);
+    LOAD_HARMONIC_A(42U, harm43_no, harm43_amp, harm43_pha);
+    LOAD_HARMONIC_A(43U, harm44_no, harm44_amp, harm44_pha);
+    LOAD_HARMONIC_A(44U, harm45_no, harm45_amp, harm45_pha);
+
+    LOAD_HARMONIC_A(45U, harm46_no, harm46_amp, harm46_pha);
+    LOAD_HARMONIC_A(46U, harm47_no, harm47_amp, harm47_pha);
+    LOAD_HARMONIC_A(47U, harm48_no, harm48_amp, harm48_pha);
+    LOAD_HARMONIC_A(48U, harm49_no, harm49_amp, harm49_pha);
+    LOAD_HARMONIC_A(49U, harm50_no, harm50_amp, harm50_pha);
+}
 
 
 
