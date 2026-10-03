@@ -52,6 +52,9 @@ extern volatile uint16_t dbRampCounter_DAB;
 extern volatile uint16_t dbRampCounter_INV;
 extern volatile float32_t gainSlew;
 
+extern volatile float32_t Vmon_DAC_float;
+extern volatile uint16_t Vmon_DAC_count;
+
 extern volatile uint32_t invStart;
 // Testing variables
 extern float32_t Vsens_grid;
@@ -1946,7 +1949,6 @@ static inline void RUN_INV_ISR_LoadMode(void)
         }
         else if (StartPowerStage == 0)
         {
-//            NPC_HAL_ForceOSTEVENTtoALLEPWM();
             StartPowerStage_prev = StartPowerStage;
         }
     }
@@ -1961,6 +1963,7 @@ static inline void RUN_INV_ISR_LoadMode(void)
     IA_RefSlewed = IacRefSlewRamp.out_slew;
     Idc_RefSlewed = Idc_RefSlewRamp.out_slew;
     Ia_ref = (1.414f) * IA_RefSlewed * sinf(V_line_pll.theta[1]-((3.141592653f * phase_angle)/180.0f) + 3.141592653f) - Idc_RefSlewed;
+
 
     /*
      * For Single Phase
@@ -1977,15 +1980,14 @@ static inline void RUN_INV_ISR_LoadMode(void)
     pi_I_inv.Ki = uk_ki;
 
     uk_Ia = runPI_Custom(&pi_I_inv, Ia_ref, Ia_fb);
-    Mff = Va_fb*0.001f;
+    Mff = Va_fb * 0.001f;
 
-    Ma1 = uk_Ia + Mff;
+    Ma1 = uk_Ia + Mff; //feed forward
 
     // duty update//
-//    NPC_Calculate_duty(Ma1);
+    NPC_Calculate_duty(Ma1,0,0);
 
-//    NPC_HAL_updatePWMDutyAndDeadBand(dutyA_S1_Ref,
-//                                     dutyB_S1_Ref,
+//    NPC_HAL_updatePWMDutyAndDeadBand(dutyA_S1_Ref,    dutyB_S1_Ref,
 //                                     DeadBand);
 
 //    // Soft Start//
@@ -1994,6 +1996,7 @@ static inline void RUN_INV_ISR_LoadMode(void)
 //        DeadBand = DeadBand - 1;
 //    }
 }
+
 
 /*******************************************************
  * *****************************************************

@@ -105,22 +105,7 @@ void main(void)
     Interrupt_initModule();
     Interrupt_initVectorTable();
 
-//    //********Booting CPU2 after CPU1************//
-
     IPC_sync(IPC_CPU2_L_CPU1_R, IPC_FLAG31);
-
-//    while((HWREGH(MEMCFG_BASE + MEMCFG_O_GSXMSEL) &
-//            (MEMCFG_GSXMSEL_MSEL_GS6 |MEMCFG_GSXMSEL_MSEL_GS8)) == 0)
-//    {
-//    }
-//
-//    IPC_clearFlagLtoR(IPC_CPU2_L_CPU1_R, IPC_FLAG_ALL);
-//
-//    while(!(HWREG(IPC_CPUXTOCPUX_BASE + IPC_O_CPU1TOCPU2IPCSET) & (1UL << ipcFlag17)))
-//    {
-//    }
-//    HWREG(IPC_CPUXTOCPUX_BASE + IPC_O_CPU2TOCPU1IPCACK) = 1UL << ipcFlag17;
-
 
      //********For SCI B **********//
 
@@ -137,13 +122,6 @@ void main(void)
     Interrupt_enable(INT_SCIC_RX);
 
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP8);
-
-    // Activate DE for SCI C
-//    GPIO_setPadConfig(95, GPIO_PIN_TYPE_PULLUP);
-//    GPIO_writePin(95, 0);
-//    GPIO_setPinConfig(GPIO_95_GPIO95);
-//    GPIO_setDirectionMode(95, GPIO_DIR_MODE_OUT);
-
 
     //*******************************//
     Interrupt_register(INT_TIMER0, &cpuTimer0ISR);
@@ -183,71 +161,12 @@ void main(void)
 
     while(1)
     {
-
         ReadMeasureDataFromSharedMemory();
         check_Master_Slave_configuration();
 
-//**********************************************************************//
-
-//        if((harmonic_select =! 0) & (harmonic_select_prev == 0))
-//        {
-//            updateBaseLookUpTable();
-//        }
-//
-//        else if((harmonic_select == 0) & (harmonic_select_prev =! 0))
-//        {
-//            Harmonic_Array_clear();
-//            Harmonic_Array_Init();
-//            updateBaseLookUpTable();
-//        }
-//
-//        harmonic_select_prev = harmonic_select;
-
-//**********************************************************************//
-//        if(harmonic_select == 0)
-//        {
-//
-//        }
-//        else
-//        {
-//            updateBaseLookUpTable();
-//            harmonic_select = 0;
-//        }
-//        if((StartPowerStage == 1) && (StartPowerStage_prev == 2) ||
-//                (StartPowerStage == 1) && (StartPowerStage_prev == 0))
-//        {
-//            Harmonic_Array_clear();
-//            Harmonic_Array_Init();
-//            updateBaseLookUpTable();
-//        }
-//        else{}
-//        StartPowerStage_prev = StartPowerStage;
-//**********************************************************************//
-//        if((StartPowerStage == 1U))
-//        {
-            /*
-             * Clear previous harmonic configuration.
-             */
-            Harmonic_Array_clear();
-
-
-            /*
-             * Populate HarmonicA[][] using the latest values
-             * received from the Main MCU.
-             */
-            Load_Received_Harmonics_To_Array();
-
-
-            /*
-             * Generate waveform LUT from the updated harmonic table.
-             */
-            updateBaseLookUpTable();
-//        }
-//        else
-//        {
-//            /* Nothing */
-//        }
-
+        Harmonic_Array_clear();
+        Load_Received_Harmonics_To_Array();
+        updateBaseLookUpTable();
     }
 }
 
@@ -255,19 +174,13 @@ void main(void)
 void config_SCI_interrupt(uint32_t base)
 {
     SCI_performSoftwareReset(base);
-    SCI_setConfig(base, 50000000, 9600, (SCI_CONFIG_WLEN_8 |
-                                                        SCI_CONFIG_STOP_ONE |
-                                                        SCI_CONFIG_PAR_NONE));
+    SCI_setConfig(base, 50000000, 9600, (SCI_CONFIG_WLEN_8 | SCI_CONFIG_STOP_ONE | SCI_CONFIG_PAR_NONE));
     SCI_resetChannels(base);
     SCI_resetRxFIFO(base);
     SCI_resetTxFIFO(base);
 
     SCI_clearOverflowStatus(base);
-    SCI_clearInterruptStatus(base, SCI_INT_TXFF |
-                                   SCI_INT_RXERR |
-                                   SCI_INT_RXFF);
-//    SCI_clearInterruptStatus(base, SCI_INT_RXERR);
-//    SCI_clearInterruptStatus(base, SCI_INT_RXFF);
+    SCI_clearInterruptStatus(base, SCI_INT_TXFF | SCI_INT_RXERR | SCI_INT_RXFF);
 
     SCI_enableFIFO(base);
 
@@ -282,7 +195,6 @@ void config_SCI_interrupt(uint32_t base)
 __interrupt void scib_isr(void)
 {
     uint32_t istat = SCI_getInterruptStatus(SCIB_BASE);
-    // Handle RX errors first (framing/parity/break). These suppress further RX interrupts until cleared.
     if (istat & SCI_INT_RXERR)
     {
         volatile uint16_t dump = HWREGH(SCIB_BASE + SCI_O_RXBUF); // read to pop error char
@@ -291,50 +203,29 @@ __interrupt void scib_isr(void)
         SCI_resetRxFIFO(SCIB_BASE);          // flush garbage
         SCI_clearOverflowStatus(SCIB_BASE);  // clear RXFFOVF if it happened
     }
-    // Drain the FIFO completely so the next interrupt can re-arm
+
     while (SCI_getRxFIFOStatus(SCIB_BASE) != SCI_FIFO_RX0)
     {
         receivedChar = (uint16_t)(SCI_readCharNonBlocking(SCIB_BASE) & 0xFF);
         SCI_clearInterruptStatus(SCIB_BASE, SCI_INT_RXFF);
         SCI_clearOverflowStatus(SCIB_BASE);
-//        if(!CRCvar)
-//        {
-            Receive_Buf_Primary[index] = (uint8_t)receivedChar;
-            index++;
-            if (receivedChar == 0x00EF)
-            {
-                Receive_Buf_Primary[index] = 0x0000;
-//                CRCvar = true;
-            }
-//        }
-//        else
-//        {
-//            if(CRCindex < 2)
-//            {
-//                Receive_Buf_Primary[index] = (uint8_t)receivedChar;
-//                index++;
-//                Receive_Buf_Primary[index] = 0x0000;
-//                CRCindex++;
-//            }
-//            if(CRCindex == 2)
-//            {
-//                handle_Display_uart(Receive_Buf_Primary, index);
-//                CRCvar = false;
-//                CRCindex = 0;
-//                index = 0;
-//            }
-//        }
+
+        Receive_Buf_Primary[index] = (uint8_t)receivedChar;
+        index++;
+        if (receivedChar == 0x00EF)
+        {
+            Receive_Buf_Primary[index] = 0x0000;
+        }
     }
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP9);
 }
 
 
-//********For SCI C  connected to PFC**********//
+//********For SCI C  connected to STM32**********//
 __interrupt void scic_isr(void)
 {
     uint32_t istat = SCI_getInterruptStatus(SCIC_BASE);
 
-    // Handle RX errors first (framing/parity/break). These suppress further RX interrupts until cleared.
     if (istat & SCI_INT_RXERR)
     {
         volatile uint16_t dump = HWREGH(SCIC_BASE + SCI_O_RXBUF); // read to pop error char
@@ -344,7 +235,6 @@ __interrupt void scic_isr(void)
         SCI_clearOverflowStatus(SCIC_BASE);  // clear RXFFOVF if it happened
     }
 
-    // Drain the FIFO completely so the next interrupt can re-arm
     while (SCI_getRxFIFOStatus(SCIC_BASE) != SCI_FIFO_RX0)
     {
         receivedChar1 = (uint16_t)(SCI_readCharNonBlocking(SCIC_BASE) & 0xFF);
@@ -356,7 +246,6 @@ __interrupt void scic_isr(void)
         if (receivedChar1 == 0x00EF)
         {
             Receive_Buf_Primary1[index1] = 0x0000;
-//            handle_PFC_uart(Receive_Buf_Primary1, index1);
             handle_Display_uart(Receive_Buf_Primary1, index1);
             index1 = 0;
         }
@@ -368,7 +257,6 @@ __interrupt void scic_isr(void)
 
 __interrupt void cpuTimer0ISR(void)
 {
-//    send_Data_to_STM();
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
 
@@ -387,32 +275,16 @@ void Read_Data_from_Shared_Memory(void)
 void configCPUTimer(uint32_t cpuTimer, float freq, float period)
 {
     uint32_t temp;
-
-    //
-    // Initialize timer period:
-    //
     temp = (uint32_t)((freq / 1000000) * period);
     CPUTimer_setPeriod(cpuTimer, temp - 1);
 
-    //
-    // Set pre-scale counter to divide by 1 (SYSCLKOUT):
-    //
     CPUTimer_setPreScaler(cpuTimer, 0);
 
-    //
-    // Initializes timer control register. The timer is stopped, reloaded,
-    // free run disabled, and interrupt enabled.
-    // Additionally, the free and soft bits are set
-    //
     CPUTimer_stopTimer(cpuTimer);
     CPUTimer_reloadTimerCounter(cpuTimer);
-    CPUTimer_setEmulationMode(cpuTimer,
-                              CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
+    CPUTimer_setEmulationMode(cpuTimer, CPUTIMER_EMULATIONMODE_STOPAFTERNEXTDECREMENT);
     CPUTimer_enableInterrupt(cpuTimer);
 
-    //
-    // Resets interrupt counters for the three cpuTimers
-    //
     if (cpuTimer == CPUTIMER0_BASE)
     {
         cpuTimer0IntCount = 0;
@@ -422,27 +294,21 @@ void configCPUTimer(uint32_t cpuTimer, float freq, float period)
 
 static inline check_Master_Slave_configuration(void)
 {
-    if(masterFlag == TRUE &&
-            Slave1Flag == FALSE &&
-            Slave2Flag == FALSE)
+    if(masterFlag == TRUE && Slave1Flag == FALSE && Slave2Flag == FALSE)
     {
         receiveHeader_setVal  = 0x005A;
         receiveHeader_MeasVal = 0x005B;
         transmitHeader        = 0x005C;
     }
 
-    else if(masterFlag == FALSE &&
-            Slave1Flag == TRUE &&
-            Slave2Flag == FALSE)
+    else if(masterFlag == FALSE && Slave1Flag == TRUE && Slave2Flag == FALSE)
     {
         receiveHeader_setVal  = 0x006A;
         receiveHeader_MeasVal = 0x006B;
         transmitHeader        = 0x006C;
     }
 
-    else if(masterFlag == FALSE &&
-            Slave1Flag == FALSE &&
-            Slave2Flag == TRUE)
+    else if(masterFlag == FALSE && Slave1Flag == FALSE && Slave2Flag == TRUE)
     {
         receiveHeader_setVal  = 0x007A;
         receiveHeader_MeasVal = 0x007B;

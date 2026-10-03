@@ -73,65 +73,22 @@ void updateBaseLookUpTable(void)
     float32_t resultA;
     float32_t outA;
 
-
     for(i = 0U; i < LUT_SIZE; i++)
     {
-        /* Base electrical angle in radians */
         thetaBase = ((float32_t)i * Angle_Step);
-
         resultA = 0.0f;
-
-
-        /* ================================================================
-         * Add all harmonics
-         * ================================================================ */
-
         for(j = 0U; j < MAX_HARMONIC_NO; j++)
         {
-            /*
-             * Skip unused harmonic entries.
-             *
-             * harmonic number = 0 means row not used.
-             */
             if(HarmonicA[j][0] <= 0.0f)
             {
                 continue;
             }
 
-
-            /*
-             * Equation:
-             *
-             *      angle = n * theta + phase
-             *
-             * where:
-             *
-             *      n     = harmonic number
-             *      theta = fundamental angle
-             *      phase = harmonic phase in radians
-             */
             harmonicAngle = (HarmonicA[j][0] * thetaBase)+ HarmonicA[j][2];
-
-
-            /*
-             * Amplitude is stored as percentage.
-             *
-             * Example:
-             *
-             *      100% -> 1.0
-             *       10% -> 0.1
-             *        5% -> 0.05
-             */
             resultA += sinf(harmonicAngle) * HarmonicA[j][1] * 0.01f;
         }
 
-
-        /* ================================================================
-         * Convert normalized waveform to signed 16-bit LUT
-         * ================================================================ */
-
         outA = resultA * 32767.0f;
-
 
         /* Saturation */
         if(outA > 32767.0f)

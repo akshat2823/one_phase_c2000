@@ -218,6 +218,9 @@ float32_t Ic_fb;
 float32_t Vc1_fb;
 
 
+volatile float32_t Vmon_DAC_float = 0.0f;
+volatile uint16_t Vmon_DAC_count = 0U;
+
 float32_t Ia_ref;
 
 float32_t scale = 1;

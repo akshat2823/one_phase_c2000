@@ -19,7 +19,7 @@
 extern void Harmonic_Array_clear(void);
 extern void Harmonic_Array_Init(void);
 extern void updateBaseLookUpTable(void);
-
+extern void Load_Received_Harmonics_To_Array(void);
 
 
 #endif /* MY_FILES_HEADERS_REF_GEN_H_ */
