@@ -16,6 +16,14 @@
 #include "Config.h"
 
 
+extern uint16_t i;
+extern uint16_t j;
+
+extern float32_t thetaBase;
+extern float32_t harmonicAngle;
+extern float32_t resultA;
+extern float32_t outA;
+
 extern void Harmonic_Array_clear(void);
 extern void Harmonic_Array_Init(void);
 extern void updateBaseLookUpTable(void);

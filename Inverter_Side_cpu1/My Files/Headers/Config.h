@@ -8,7 +8,7 @@
 #ifndef MY_FILES_HEADERS_CONFIG_H_
 #define MY_FILES_HEADERS_CONFIG_H_
 
-#define MAX_LENGTH          1024
+#define MAX_LENGTH          1500
 #define MAX_HARMONIC_NO     50
 #define LUT_SIZE            720
 #define TWO_PI              6.283185307f

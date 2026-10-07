@@ -13,7 +13,7 @@
 #define CONVERTER_TYPE  SINGLE_PHASE
 
 
-#define MAX_LENGTH      1174
+#define MAX_LENGTH      1500
 extern uint16_t Receive_Buf_Secondary[MAX_LENGTH];
 extern uint16_t Receive_Buf_Primary[MAX_LENGTH];  // to handle incoming data from IOD, connected to SCIB
 extern uint16_t Receive_Buf_Primary1[MAX_LENGTH];  // to handle incoming data from PFC, connected to SCIC

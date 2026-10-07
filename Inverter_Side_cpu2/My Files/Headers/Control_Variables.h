@@ -41,6 +41,8 @@ extern uint32_t OutputState;
 extern uint32_t SelMode;
 extern uint32_t CV_CC_mode;
 
+extern uint32_t LoadSourceMode;
+
 // --- Source Setpoints (1 phase) ---
 extern float32_t SetSourceVoltage1P;
 extern float32_t SetSourceCurrent1P;

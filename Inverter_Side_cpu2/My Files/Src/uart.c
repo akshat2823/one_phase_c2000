@@ -212,7 +212,8 @@ void SyncCommToControl(void)
     Vac_fundamental    = SetSourceVoltage1P;
     Iset               = SetSourceCurrent1P;
     AC_Freq_Ref        = SetSourceFrequency1P;
-    V_DC   = SetVdc;
+    V_DC               = SetVdc;
+    LoadSource_mode    = LoadSourceMode;
 
     // ---------- Limits: Comm -> Control ----------
     Limit_VAC          = SetLimVac;

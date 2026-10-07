@@ -63,6 +63,7 @@ extern int check2;
 extern float y[2];
 extern float alpha;
 
+extern float32_t Imon;
 
 //#define BaseLUT_SIZE    720
 extern uint16_t LUT_Size;
@@ -1228,8 +1229,6 @@ static inline void Ref_Gen_function(void)
     }
     else if(Slave1Flag)
     {
-
-
         syncIN = GPIO_readPin(29);
 
         if(syncIN ==1 && oldSyncIN==0)
@@ -1996,6 +1995,7 @@ static inline void RUN_INV_ISR_LoadMode(void)
 //        DeadBand = DeadBand - 1;
 //    }
 }
+
 
 
 /*******************************************************

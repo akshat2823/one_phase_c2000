@@ -8,6 +8,15 @@
 #include "Ref_Gen.h"
 #include "Control_Variables.h"
 
+
+uint16_t i;
+uint16_t j;
+
+float32_t thetaBase;
+float32_t harmonicAngle;
+float32_t resultA;
+float32_t outA;
+
 #define DEG_TO_RAD                                          (0.01745329251994329577f)
 
 #define LOAD_HARMONIC_A(index, no_var, amp_var, pha_var)     \
@@ -17,6 +26,9 @@
         HarmonicA[(index)][1] = (amp_var);                   \
         HarmonicA[(index)][2] = (pha_var) * DEG_TO_RAD;      \
     } while(0)
+
+
+
 
 void Harmonic_Array_clear(void)
 {
@@ -65,13 +77,7 @@ void Harmonic_Array_Init(void)
 
 void updateBaseLookUpTable(void)
 {
-    uint16_t i;
-    uint16_t j;
 
-    float32_t thetaBase;
-    float32_t harmonicAngle;
-    float32_t resultA;
-    float32_t outA;
 
     for(i = 0U; i < LUT_SIZE; i++)
     {
@@ -115,7 +121,7 @@ void Load_Received_Harmonics_To_Array(void)
      * replace 100.0f with harm1_amp.
      * ================================================================ */
 
-    HarmonicA[0][0] = harm1_no;
+    HarmonicA[0][0] = 1.0f;
     HarmonicA[0][1] = 100.0f;
     HarmonicA[0][2] = harm1_pha;
 

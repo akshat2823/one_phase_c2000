@@ -48,6 +48,7 @@ extern float32_t MeasVoltageCF;
 extern float32_t MeasCurrentCF;
 
 extern uint32_t SelMode;
+extern uint32_t LoadSourceMode;
 
 // --- Source Setpoints (1 phase) ---
 extern float32_t SetSourceVoltage1P;

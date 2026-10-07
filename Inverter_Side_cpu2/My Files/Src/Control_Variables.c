@@ -50,6 +50,8 @@ float32_t SetLimVdcPlus = 0.0f;
 float32_t SetLimVdcMinus = 0.0f;
 float32_t SetVdc   = 0.0f;
 
+uint32_t LoadSourceMode;
+
 
 
 volatile int32_t DSP_boot       = 0;

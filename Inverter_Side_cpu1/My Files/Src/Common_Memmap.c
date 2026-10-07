@@ -624,6 +624,22 @@ void ReadingDataFromSharedMemory(void)
 {
 
     SelMode = ReadByteFromMainBuff(DSP_ACPS_MODE);
+    LoadSourceMode = ReadByteFromMainBuff(DSP_LOAD_SOURCE_MODE);
+    Load_mode = ReadByteFromMainBuff(DSP_LOAD_MODE);
+    Selected_Topology = ReadByteFromMainBuff(DSP_TOPOLOGY_SELECT);
+
+    R_top  = ReadFloatFromMainBuff(DSP_ADR_SET_R_TOP);
+    L_top = ReadFloatFromMainBuff(DSP_ADR_SET_L_TOP);
+    C_top = ReadFloatFromMainBuff(DSP_ADR_SET_C_TOP);
+    RL_top = ReadFloatFromMainBuff(DSP_ADR_SET_RL_TOP);
+    RC_top = ReadFloatFromMainBuff(DSP_ADR_SET_RC_TOP);
+    RS_top = ReadFloatFromMainBuff(DSP_ADR_SET_RS_TOP);
+    P_top = ReadFloatFromMainBuff(DSP_ADR_SET_P_TOP);
+    QL_top = ReadFloatFromMainBuff(DSP_ADR_SET_QL_TOP);
+    QC_top  = ReadFloatFromMainBuff(DSP_ADR_SET_QC_TOP);
+    IL_top = ReadFloatFromMainBuff(DSP_ADR_SET_IL_TOP);
+    VC_top = ReadFloatFromMainBuff(DSP_ADR_SET_VC_TOP);
+
     // ========================================================================
     // 1. SOURCE SETPOINTS (FLOAT AREA)
     // ========================================================================
@@ -700,6 +716,7 @@ void SyncCommToControl(void)
     Iset               = SetSourceCurrent1P;
     AC_Freq_Ref        = SetSourceFrequency1P;
     V_DC               = SetVdc;
+    LoadSource_mode    = LoadSourceMode;
 
     // ---------- Limits: Comm -> Control ----------
     Limit_VAC          = SetLimVac;

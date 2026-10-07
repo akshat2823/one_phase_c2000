@@ -692,67 +692,224 @@ void ProcessData(void)
     SetLimVdcPlus = ReadFloatFromMainBuff(DSP_LIM_VDC_PLUS);
     SetLimVdcMinus = ReadFloatFromMainBuff(DSP_LIM_VDC_MINUS);
 
+
+    R_top  = ReadFloatFromMainBuff(DSP_ADR_SET_R_TOP);
+    L_top = ReadFloatFromMainBuff(DSP_ADR_SET_L_TOP);
+    C_top = ReadFloatFromMainBuff(DSP_ADR_SET_C_TOP);
+    RL_top = ReadFloatFromMainBuff(DSP_ADR_SET_RL_TOP);
+    RC_top = ReadFloatFromMainBuff(DSP_ADR_SET_RC_TOP);
+    RS_top = ReadFloatFromMainBuff(DSP_ADR_SET_RS_TOP);
+    P_top = ReadFloatFromMainBuff(DSP_ADR_SET_P_TOP);
+    QL_top = ReadFloatFromMainBuff(DSP_ADR_SET_QL_TOP);
+    QC_top  = ReadFloatFromMainBuff(DSP_ADR_SET_QC_TOP);
+    IL_top = ReadFloatFromMainBuff(DSP_ADR_SET_IL_TOP);
+    VC_top = ReadFloatFromMainBuff(DSP_ADR_SET_VC_TOP);
+
     SelMode = ReadByteFromMainBuff(DSP_ACPS_MODE);
+    LoadSourceMode = ReadByteFromMainBuff(DSP_LOAD_SOURCE_MODE);
+    Load_mode = ReadByteFromMainBuff(DSP_LOAD_MODE);
+    Selected_Topology = ReadByteFromMainBuff(DSP_TOPOLOGY_SELECT);
 
-    READ_HARMONIC_FROM_MAIN(1);
-    READ_HARMONIC_FROM_MAIN(2);
-    READ_HARMONIC_FROM_MAIN(3);
-    READ_HARMONIC_FROM_MAIN(4);
-    READ_HARMONIC_FROM_MAIN(5);
 
-    READ_HARMONIC_FROM_MAIN(6);
-    READ_HARMONIC_FROM_MAIN(7);
-    READ_HARMONIC_FROM_MAIN(8);
-    READ_HARMONIC_FROM_MAIN(9);
-    READ_HARMONIC_FROM_MAIN(10);
+    harm1_no   = ReadFloatFromMainBuff(DSP_HARM1_NUM);
+    harm1_amp  = ReadFloatFromMainBuff(DSP_HARM1_PERCENT);
+    harm1_pha  = ReadFloatFromMainBuff(DSP_HARM1_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(11);
-    READ_HARMONIC_FROM_MAIN(12);
-    READ_HARMONIC_FROM_MAIN(13);
-    READ_HARMONIC_FROM_MAIN(14);
-    READ_HARMONIC_FROM_MAIN(15);
+    harm2_no   = ReadFloatFromMainBuff(DSP_HARM2_NUM);
+    harm2_amp  = ReadFloatFromMainBuff(DSP_HARM2_PERCENT);
+    harm2_pha  = ReadFloatFromMainBuff(DSP_HARM2_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(16);
-    READ_HARMONIC_FROM_MAIN(17);
-    READ_HARMONIC_FROM_MAIN(18);
-    READ_HARMONIC_FROM_MAIN(19);
-    READ_HARMONIC_FROM_MAIN(20);
+    harm3_no   = ReadFloatFromMainBuff(DSP_HARM3_NUM);
+    harm3_amp  = ReadFloatFromMainBuff(DSP_HARM3_PERCENT);
+    harm3_pha  = ReadFloatFromMainBuff(DSP_HARM3_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(21);
-    READ_HARMONIC_FROM_MAIN(22);
-    READ_HARMONIC_FROM_MAIN(23);
-    READ_HARMONIC_FROM_MAIN(24);
-    READ_HARMONIC_FROM_MAIN(25);
+    harm4_no   = ReadFloatFromMainBuff(DSP_HARM4_NUM);
+    harm4_amp  = ReadFloatFromMainBuff(DSP_HARM4_PERCENT);
+    harm4_pha  = ReadFloatFromMainBuff(DSP_HARM4_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(26);
-    READ_HARMONIC_FROM_MAIN(27);
-    READ_HARMONIC_FROM_MAIN(28);
-    READ_HARMONIC_FROM_MAIN(29);
-    READ_HARMONIC_FROM_MAIN(30);
+    harm5_no   = ReadFloatFromMainBuff(DSP_HARM5_NUM);
+    harm5_amp  = ReadFloatFromMainBuff(DSP_HARM5_PERCENT);
+    harm5_pha  = ReadFloatFromMainBuff(DSP_HARM5_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(31);
-    READ_HARMONIC_FROM_MAIN(32);
-    READ_HARMONIC_FROM_MAIN(33);
-    READ_HARMONIC_FROM_MAIN(34);
-    READ_HARMONIC_FROM_MAIN(35);
+    harm6_no   = ReadFloatFromMainBuff(DSP_HARM6_NUM);
+    harm6_amp  = ReadFloatFromMainBuff(DSP_HARM6_PERCENT);
+    harm6_pha  = ReadFloatFromMainBuff(DSP_HARM6_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(36);
-    READ_HARMONIC_FROM_MAIN(37);
-    READ_HARMONIC_FROM_MAIN(38);
-    READ_HARMONIC_FROM_MAIN(39);
-    READ_HARMONIC_FROM_MAIN(40);
+    harm7_no   = ReadFloatFromMainBuff(DSP_HARM7_NUM);
+    harm7_amp  = ReadFloatFromMainBuff(DSP_HARM7_PERCENT);
+    harm7_pha  = ReadFloatFromMainBuff(DSP_HARM7_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(41);
-    READ_HARMONIC_FROM_MAIN(42);
-    READ_HARMONIC_FROM_MAIN(43);
-    READ_HARMONIC_FROM_MAIN(44);
-    READ_HARMONIC_FROM_MAIN(45);
+    harm8_no   = ReadFloatFromMainBuff(DSP_HARM8_NUM);
+    harm8_amp  = ReadFloatFromMainBuff(DSP_HARM8_PERCENT);
+    harm8_pha  = ReadFloatFromMainBuff(DSP_HARM8_PHASE);
 
-    READ_HARMONIC_FROM_MAIN(46);
-    READ_HARMONIC_FROM_MAIN(47);
-    READ_HARMONIC_FROM_MAIN(48);
-    READ_HARMONIC_FROM_MAIN(49);
-    READ_HARMONIC_FROM_MAIN(50);
+    harm9_no   = ReadFloatFromMainBuff(DSP_HARM9_NUM);
+    harm9_amp  = ReadFloatFromMainBuff(DSP_HARM9_PERCENT);
+    harm9_pha  = ReadFloatFromMainBuff(DSP_HARM9_PHASE);
+
+    harm10_no   = ReadFloatFromMainBuff(DSP_HARM10_NUM);
+    harm10_amp  = ReadFloatFromMainBuff(DSP_HARM10_PERCENT);
+    harm10_pha  = ReadFloatFromMainBuff(DSP_HARM10_PHASE);
+
+    harm11_no   = ReadFloatFromMainBuff(DSP_HARM11_NUM);
+    harm11_amp  = ReadFloatFromMainBuff(DSP_HARM11_PERCENT);
+    harm11_pha  = ReadFloatFromMainBuff(DSP_HARM11_PHASE);
+
+    harm12_no   = ReadFloatFromMainBuff(DSP_HARM12_NUM);
+    harm12_amp  = ReadFloatFromMainBuff(DSP_HARM12_PERCENT);
+    harm12_pha  = ReadFloatFromMainBuff(DSP_HARM12_PHASE);
+
+    harm13_no   = ReadFloatFromMainBuff(DSP_HARM13_NUM);
+    harm13_amp  = ReadFloatFromMainBuff(DSP_HARM13_PERCENT);
+    harm13_pha  = ReadFloatFromMainBuff(DSP_HARM13_PHASE);
+
+    harm14_no   = ReadFloatFromMainBuff(DSP_HARM14_NUM);
+    harm14_amp  = ReadFloatFromMainBuff(DSP_HARM14_PERCENT);
+    harm14_pha  = ReadFloatFromMainBuff(DSP_HARM14_PHASE);
+
+    harm15_no   = ReadFloatFromMainBuff(DSP_HARM15_NUM);
+    harm15_amp  = ReadFloatFromMainBuff(DSP_HARM15_PERCENT);
+    harm15_pha  = ReadFloatFromMainBuff(DSP_HARM15_PHASE);
+
+    harm16_no   = ReadFloatFromMainBuff(DSP_HARM16_NUM);
+    harm16_amp  = ReadFloatFromMainBuff(DSP_HARM16_PERCENT);
+    harm16_pha  = ReadFloatFromMainBuff(DSP_HARM16_PHASE);
+
+    harm17_no   = ReadFloatFromMainBuff(DSP_HARM17_NUM);
+    harm17_amp  = ReadFloatFromMainBuff(DSP_HARM17_PERCENT);
+    harm17_pha  = ReadFloatFromMainBuff(DSP_HARM17_PHASE);
+
+    harm18_no   = ReadFloatFromMainBuff(DSP_HARM18_NUM);
+    harm18_amp  = ReadFloatFromMainBuff(DSP_HARM18_PERCENT);
+    harm18_pha  = ReadFloatFromMainBuff(DSP_HARM18_PHASE);
+
+    harm19_no   = ReadFloatFromMainBuff(DSP_HARM19_NUM);
+    harm19_amp  = ReadFloatFromMainBuff(DSP_HARM19_PERCENT);
+    harm19_pha  = ReadFloatFromMainBuff(DSP_HARM19_PHASE);
+
+    harm20_no   = ReadFloatFromMainBuff(DSP_HARM20_NUM);
+    harm20_amp  = ReadFloatFromMainBuff(DSP_HARM20_PERCENT);
+    harm20_pha  = ReadFloatFromMainBuff(DSP_HARM20_PHASE);
+
+    harm21_no   = ReadFloatFromMainBuff(DSP_HARM21_NUM);
+    harm21_amp  = ReadFloatFromMainBuff(DSP_HARM21_PERCENT);
+    harm21_pha  = ReadFloatFromMainBuff(DSP_HARM21_PHASE);
+
+    harm22_no   = ReadFloatFromMainBuff(DSP_HARM22_NUM);
+    harm22_amp  = ReadFloatFromMainBuff(DSP_HARM22_PERCENT);
+    harm22_pha  = ReadFloatFromMainBuff(DSP_HARM22_PHASE);
+
+    harm23_no   = ReadFloatFromMainBuff(DSP_HARM23_NUM);
+    harm23_amp  = ReadFloatFromMainBuff(DSP_HARM23_PERCENT);
+    harm23_pha  = ReadFloatFromMainBuff(DSP_HARM23_PHASE);
+
+    harm24_no   = ReadFloatFromMainBuff(DSP_HARM24_NUM);
+    harm24_amp  = ReadFloatFromMainBuff(DSP_HARM24_PERCENT);
+    harm24_pha  = ReadFloatFromMainBuff(DSP_HARM24_PHASE);
+
+    harm25_no   = ReadFloatFromMainBuff(DSP_HARM25_NUM);
+    harm25_amp  = ReadFloatFromMainBuff(DSP_HARM25_PERCENT);
+    harm25_pha  = ReadFloatFromMainBuff(DSP_HARM25_PHASE);
+
+    harm26_no   = ReadFloatFromMainBuff(DSP_HARM26_NUM);
+    harm26_amp  = ReadFloatFromMainBuff(DSP_HARM26_PERCENT);
+    harm26_pha  = ReadFloatFromMainBuff(DSP_HARM26_PHASE);
+
+    harm27_no   = ReadFloatFromMainBuff(DSP_HARM27_NUM);
+    harm27_amp  = ReadFloatFromMainBuff(DSP_HARM27_PERCENT);
+    harm27_pha  = ReadFloatFromMainBuff(DSP_HARM27_PHASE);
+
+    harm28_no   = ReadFloatFromMainBuff(DSP_HARM28_NUM);
+    harm28_amp  = ReadFloatFromMainBuff(DSP_HARM28_PERCENT);
+    harm28_pha  = ReadFloatFromMainBuff(DSP_HARM28_PHASE);
+
+    harm29_no   = ReadFloatFromMainBuff(DSP_HARM29_NUM);
+    harm29_amp  = ReadFloatFromMainBuff(DSP_HARM29_PERCENT);
+    harm29_pha  = ReadFloatFromMainBuff(DSP_HARM29_PHASE);
+
+    harm30_no   = ReadFloatFromMainBuff(DSP_HARM30_NUM);
+    harm30_amp  = ReadFloatFromMainBuff(DSP_HARM30_PERCENT);
+    harm30_pha  = ReadFloatFromMainBuff(DSP_HARM30_PHASE);
+
+    harm31_no   = ReadFloatFromMainBuff(DSP_HARM31_NUM);
+    harm31_amp  = ReadFloatFromMainBuff(DSP_HARM31_PERCENT);
+    harm31_pha  = ReadFloatFromMainBuff(DSP_HARM31_PHASE);
+
+    harm32_no   = ReadFloatFromMainBuff(DSP_HARM32_NUM);
+    harm32_amp  = ReadFloatFromMainBuff(DSP_HARM32_PERCENT);
+    harm32_pha  = ReadFloatFromMainBuff(DSP_HARM32_PHASE);
+
+    harm33_no   = ReadFloatFromMainBuff(DSP_HARM33_NUM);
+    harm33_amp  = ReadFloatFromMainBuff(DSP_HARM33_PERCENT);
+    harm33_pha  = ReadFloatFromMainBuff(DSP_HARM33_PHASE);
+
+    harm34_no   = ReadFloatFromMainBuff(DSP_HARM34_NUM);
+    harm34_amp  = ReadFloatFromMainBuff(DSP_HARM34_PERCENT);
+    harm34_pha  = ReadFloatFromMainBuff(DSP_HARM34_PHASE);
+
+    harm35_no   = ReadFloatFromMainBuff(DSP_HARM35_NUM);
+    harm35_amp  = ReadFloatFromMainBuff(DSP_HARM35_PERCENT);
+    harm35_pha  = ReadFloatFromMainBuff(DSP_HARM35_PHASE);
+
+    harm36_no   = ReadFloatFromMainBuff(DSP_HARM36_NUM);
+    harm36_amp  = ReadFloatFromMainBuff(DSP_HARM36_PERCENT);
+    harm36_pha  = ReadFloatFromMainBuff(DSP_HARM36_PHASE);
+
+    harm37_no   = ReadFloatFromMainBuff(DSP_HARM37_NUM);
+    harm37_amp  = ReadFloatFromMainBuff(DSP_HARM37_PERCENT);
+    harm37_pha  = ReadFloatFromMainBuff(DSP_HARM37_PHASE);
+
+    harm38_no   = ReadFloatFromMainBuff(DSP_HARM38_NUM);
+    harm38_amp  = ReadFloatFromMainBuff(DSP_HARM38_PERCENT);
+    harm38_pha  = ReadFloatFromMainBuff(DSP_HARM38_PHASE);
+
+    harm39_no   = ReadFloatFromMainBuff(DSP_HARM39_NUM);
+    harm39_amp  = ReadFloatFromMainBuff(DSP_HARM39_PERCENT);
+    harm39_pha  = ReadFloatFromMainBuff(DSP_HARM39_PHASE);
+
+    harm40_no   = ReadFloatFromMainBuff(DSP_HARM40_NUM);
+    harm40_amp  = ReadFloatFromMainBuff(DSP_HARM40_PERCENT);
+    harm40_pha  = ReadFloatFromMainBuff(DSP_HARM40_PHASE);
+
+    harm41_no   = ReadFloatFromMainBuff(DSP_HARM41_NUM);
+    harm41_amp  = ReadFloatFromMainBuff(DSP_HARM41_PERCENT);
+    harm41_pha  = ReadFloatFromMainBuff(DSP_HARM41_PHASE);
+
+    harm42_no   = ReadFloatFromMainBuff(DSP_HARM42_NUM);
+    harm42_amp  = ReadFloatFromMainBuff(DSP_HARM42_PERCENT);
+    harm42_pha  = ReadFloatFromMainBuff(DSP_HARM42_PHASE);
+
+    harm43_no   = ReadFloatFromMainBuff(DSP_HARM43_NUM);
+    harm43_amp  = ReadFloatFromMainBuff(DSP_HARM43_PERCENT);
+    harm43_pha  = ReadFloatFromMainBuff(DSP_HARM43_PHASE);
+
+    harm44_no   = ReadFloatFromMainBuff(DSP_HARM44_NUM);
+    harm44_amp  = ReadFloatFromMainBuff(DSP_HARM44_PERCENT);
+    harm44_pha  = ReadFloatFromMainBuff(DSP_HARM44_PHASE);
+
+    harm45_no   = ReadFloatFromMainBuff(DSP_HARM45_NUM);
+    harm45_amp  = ReadFloatFromMainBuff(DSP_HARM45_PERCENT);
+    harm45_pha  = ReadFloatFromMainBuff(DSP_HARM45_PHASE);
+
+    harm46_no   = ReadFloatFromMainBuff(DSP_HARM46_NUM);
+    harm46_amp  = ReadFloatFromMainBuff(DSP_HARM46_PERCENT);
+    harm46_pha  = ReadFloatFromMainBuff(DSP_HARM46_PHASE);
+
+    harm47_no   = ReadFloatFromMainBuff(DSP_HARM47_NUM);
+    harm47_amp  = ReadFloatFromMainBuff(DSP_HARM47_PERCENT);
+    harm47_pha  = ReadFloatFromMainBuff(DSP_HARM47_PHASE);
+
+    harm48_no   = ReadFloatFromMainBuff(DSP_HARM48_NUM);
+    harm48_amp  = ReadFloatFromMainBuff(DSP_HARM48_PERCENT);
+    harm48_pha  = ReadFloatFromMainBuff(DSP_HARM48_PHASE);
+
+    harm49_no   = ReadFloatFromMainBuff(DSP_HARM49_NUM);
+    harm49_amp  = ReadFloatFromMainBuff(DSP_HARM49_PERCENT);
+    harm49_pha  = ReadFloatFromMainBuff(DSP_HARM49_PHASE);
+
+    harm50_no   = ReadFloatFromMainBuff(DSP_HARM50_NUM);
+    harm50_amp  = ReadFloatFromMainBuff(DSP_HARM50_PERCENT);
+    harm50_pha  = ReadFloatFromMainBuff(DSP_HARM50_PHASE);
 }
 
 // ============================================================================

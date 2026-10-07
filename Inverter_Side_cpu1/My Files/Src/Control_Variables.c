@@ -31,6 +31,7 @@ float32_t MeasCurrentCF        = 0.0f;
 
 
 uint32_t SelMode;
+uint32_t LoadSourceMode;
 
 float32_t SetSourceVoltage1P  = 0.0f;
 float32_t SetSourceCurrent1P  = 0.0f;

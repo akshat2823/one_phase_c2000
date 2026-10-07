@@ -164,7 +164,6 @@ void main(void)
         ReadMeasureDataFromSharedMemory();
         check_Master_Slave_configuration();
 
-        Harmonic_Array_clear();
         Load_Received_Harmonics_To_Array();
         updateBaseLookUpTable();
     }

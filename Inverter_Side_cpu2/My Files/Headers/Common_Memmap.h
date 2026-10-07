@@ -77,13 +77,28 @@ typedef struct{
 #define DSP_SET_START_ADDR                      (DSP_MEAS_END_ADDR)
 
 #define DSP_ACPS_MODE                           (DSP_SET_START_ADDR)
-#define DSP_SET_FREQ                            (DSP_ACPS_MODE + SIZE_U8)
+#define DSP_LOAD_SOURCE_MODE                    (DSP_ACPS_MODE + SIZE_U8)
+#define DSP_LOAD_MODE                           (DSP_LOAD_SOURCE_MODE + SIZE_U8)
+#define DSP_TOPOLOGY_SELECT                     (DSP_LOAD_MODE + SIZE_U8)
+#define DSP_SET_FREQ                            (DSP_TOPOLOGY_SELECT + SIZE_U8)
 
 #define DSP_SET_VAC                             (DSP_SET_FREQ + SIZE_FLOAT)
 #define DSP_SET_IAC                             (DSP_SET_VAC + SIZE_FLOAT)
 #define DSP_SET_VDC                             (DSP_SET_IAC + SIZE_FLOAT)
 
-#define DSP_LIM_VAC                             (DSP_SET_VDC + SIZE_FLOAT)
+#define DSP_ADR_SET_R_TOP                       (DSP_SET_VDC + SIZE_FLOAT)
+#define DSP_ADR_SET_L_TOP                       (DSP_ADR_SET_R_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_C_TOP                       (DSP_ADR_SET_L_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_RL_TOP                      (DSP_ADR_SET_C_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_RC_TOP                      (DSP_ADR_SET_RL_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_RS_TOP                      (DSP_ADR_SET_RC_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_P_TOP                       (DSP_ADR_SET_RS_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_QL_TOP                      (DSP_ADR_SET_P_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_QC_TOP                      (DSP_ADR_SET_QL_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_IL_TOP                      (DSP_ADR_SET_QC_TOP + SIZE_FLOAT)
+#define DSP_ADR_SET_VC_TOP                      (DSP_ADR_SET_IL_TOP + SIZE_FLOAT)
+
+#define DSP_LIM_VAC                             (DSP_ADR_SET_VC_TOP + SIZE_FLOAT)
 #define DSP_LIM_IAC                             (DSP_LIM_VAC + SIZE_FLOAT)
 #define DSP_LIM_FREQ                            (DSP_LIM_IAC + SIZE_FLOAT)
 #define DSP_LIM_POW                             (DSP_LIM_FREQ + SIZE_FLOAT)
@@ -94,294 +109,471 @@ typedef struct{
 // 3. HARMONIC SETTINGS (MCU -> DSP Phase X)
 // ========================================================================
 
-/*
- * Harmonic waveform enable / number setting.
- *
- * Existing code used:
- *
- * BUFF_ADR_HARM1_NO = BUFF_ADR_HARM_WAVEFORM_NUM + 1
- *
- * Therefore harmonic waveform number is assumed to occupy 1 byte.
- */
+
 #define DSP_HARM_WAVEFORM_NUM                   (DSP_LIM_VDC_MINUS + SIZE_FLOAT)
 
+// ========================================================================
+// HARMONIC SETTINGS
+// ========================================================================
 
-/* ========================================================================
- * Harmonic entry layout
- *
- * Each harmonic contains:
- *
- *      Harmonic Number      : 4 bytes
- *      Harmonic Amplitude   : 4 bytes
- *      Harmonic Phase       : 4 bytes
- *
- * Total per harmonic        : 12 bytes
- * ======================================================================== */
-
-#define DSP_HARM_BASE                           (DSP_HARM_WAVEFORM_NUM + SIZE_U8)
-#define DSP_HARM_ENTRY_SIZE                     (3U * SIZE_FLOAT)
-#define DSP_HARM_NUM(n)                         (DSP_HARM_BASE + (((n) - 1U) * DSP_HARM_ENTRY_SIZE))
-#define DSP_HARM_PERCENT(n)                     (DSP_HARM_NUM(n) + SIZE_FLOAT)
-#define DSP_HARM_PHASE(n)                       (DSP_HARM_PERCENT(n) + SIZE_FLOAT)
-
-/* ========================================================================
- * Individual harmonic aliases
- * ======================================================================== */
-
-/* Harmonic 1 */
-#define DSP_HARM1_NO                            DSP_HARM_NUM(1U)
-#define DSP_HARM1_AMP                           DSP_HARM_AMP(1U)
-#define DSP_HARM1_PHASE                         DSP_HARM_PHASE(1U)
-
-/* Harmonic 2 */
-#define DSP_HARM2_NO                            DSP_HARM_NUM(2U)
-#define DSP_HARM2_AMP                           DSP_HARM_AMP(2U)
-#define DSP_HARM2_PHASE                         DSP_HARM_PHASE(2U)
-
-/* Harmonic 3 */
-#define DSP_HARM3_NO                            DSP_HARM_NUM(3U)
-#define DSP_HARM3_AMP                           DSP_HARM_AMP(3U)
-#define DSP_HARM3_PHASE                         DSP_HARM_PHASE(3U)
-
-/* Harmonic 4 */
-#define DSP_HARM4_NO                            DSP_HARM_NUM(4U)
-#define DSP_HARM4_AMP                           DSP_HARM_AMP(4U)
-#define DSP_HARM4_PHASE                         DSP_HARM_PHASE(4U)
-
-/* Harmonic 5 */
-#define DSP_HARM5_NO                            DSP_HARM_NUM(5U)
-#define DSP_HARM5_AMP                           DSP_HARM_AMP(5U)
-#define DSP_HARM5_PHASE                         DSP_HARM_PHASE(5U)
-
-/* Harmonic 6 */
-#define DSP_HARM6_NO                            DSP_HARM_NUM(6U)
-#define DSP_HARM6_AMP                           DSP_HARM_AMP(6U)
-#define DSP_HARM6_PHASE                         DSP_HARM_PHASE(6U)
-
-/* Harmonic 7 */
-#define DSP_HARM7_NO                            DSP_HARM_NUM(7U)
-#define DSP_HARM7_AMP                           DSP_HARM_AMP(7U)
-#define DSP_HARM7_PHASE                         DSP_HARM_PHASE(7U)
-
-/* Harmonic 8 */
-#define DSP_HARM8_NO                            DSP_HARM_NUM(8U)
-#define DSP_HARM8_AMP                           DSP_HARM_AMP(8U)
-#define DSP_HARM8_PHASE                         DSP_HARM_PHASE(8U)
-
-/* Harmonic 9 */
-#define DSP_HARM9_NO                            DSP_HARM_NUM(9U)
-#define DSP_HARM9_AMP                           DSP_HARM_AMP(9U)
-#define DSP_HARM9_PHASE                         DSP_HARM_PHASE(9U)
-
-/* Harmonic 10 */
-#define DSP_HARM10_NO                           DSP_HARM_NUM(10U)
-#define DSP_HARM10_AMP                          DSP_HARM_AMP(10U)
-#define DSP_HARM10_PHASE                        DSP_HARM_PHASE(10U)
-
-/* Harmonic 11 */
-#define DSP_HARM11_NO                           DSP_HARM_NUM(11U)
-#define DSP_HARM11_AMP                          DSP_HARM_AMP(11U)
-#define DSP_HARM11_PHASE                        DSP_HARM_PHASE(11U)
-
-/* Harmonic 12 */
-#define DSP_HARM12_NO                           DSP_HARM_NUM(12U)
-#define DSP_HARM12_AMP                          DSP_HARM_AMP(12U)
-#define DSP_HARM12_PHASE                        DSP_HARM_PHASE(12U)
-
-/* Harmonic 13 */
-#define DSP_HARM13_NO                           DSP_HARM_NUM(13U)
-#define DSP_HARM13_AMP                          DSP_HARM_AMP(13U)
-#define DSP_HARM13_PHASE                        DSP_HARM_PHASE(13U)
-
-/* Harmonic 14 */
-#define DSP_HARM14_NO                           DSP_HARM_NUM(14U)
-#define DSP_HARM14_AMP                          DSP_HARM_AMP(14U)
-#define DSP_HARM14_PHASE                        DSP_HARM_PHASE(14U)
-
-/* Harmonic 15 */
-#define DSP_HARM15_NO                           DSP_HARM_NUM(15U)
-#define DSP_HARM15_AMP                          DSP_HARM_AMP(15U)
-#define DSP_HARM15_PHASE                        DSP_HARM_PHASE(15U)
-
-/* Harmonic 16 */
-#define DSP_HARM16_NO                           DSP_HARM_NUM(16U)
-#define DSP_HARM16_AMP                          DSP_HARM_AMP(16U)
-#define DSP_HARM16_PHASE                        DSP_HARM_PHASE(16U)
-
-/* Harmonic 17 */
-#define DSP_HARM17_NO                           DSP_HARM_NUM(17U)
-#define DSP_HARM17_AMP                          DSP_HARM_AMP(17U)
-#define DSP_HARM17_PHASE                        DSP_HARM_PHASE(17U)
-
-/* Harmonic 18 */
-#define DSP_HARM18_NO                           DSP_HARM_NUM(18U)
-#define DSP_HARM18_AMP                          DSP_HARM_AMP(18U)
-#define DSP_HARM18_PHASE                        DSP_HARM_PHASE(18U)
-
-/* Harmonic 19 */
-#define DSP_HARM19_NO                           DSP_HARM_NUM(19U)
-#define DSP_HARM19_AMP                          DSP_HARM_AMP(19U)
-#define DSP_HARM19_PHASE                        DSP_HARM_PHASE(19U)
-
-/* Harmonic 20 */
-#define DSP_HARM20_NO                           DSP_HARM_NUM(20U)
-#define DSP_HARM20_AMP                          DSP_HARM_AMP(20U)
-#define DSP_HARM20_PHASE                        DSP_HARM_PHASE(20U)
-
-/* Harmonic 21 */
-#define DSP_HARM21_NO                           DSP_HARM_NUM(21U)
-#define DSP_HARM21_AMP                          DSP_HARM_AMP(21U)
-#define DSP_HARM21_PHASE                        DSP_HARM_PHASE(21U)
-
-/* Harmonic 22 */
-#define DSP_HARM22_NO                           DSP_HARM_NUM(22U)
-#define DSP_HARM22_AMP                          DSP_HARM_AMP(22U)
-#define DSP_HARM22_PHASE                        DSP_HARM_PHASE(22U)
-
-/* Harmonic 23 */
-#define DSP_HARM23_NO                           DSP_HARM_NUM(23U)
-#define DSP_HARM23_AMP                          DSP_HARM_AMP(23U)
-#define DSP_HARM23_PHASE                        DSP_HARM_PHASE(23U)
-
-/* Harmonic 24 */
-#define DSP_HARM24_NO                           DSP_HARM_NUM(24U)
-#define DSP_HARM24_AMP                          DSP_HARM_AMP(24U)
-#define DSP_HARM24_PHASE                        DSP_HARM_PHASE(24U)
-
-/* Harmonic 25 */
-#define DSP_HARM25_NO                           DSP_HARM_NUM(25U)
-#define DSP_HARM25_AMP                          DSP_HARM_AMP(25U)
-#define DSP_HARM25_PHASE                        DSP_HARM_PHASE(25U)
-
-/* Harmonic 26 */
-#define DSP_HARM26_NO                           DSP_HARM_NUM(26U)
-#define DSP_HARM26_AMP                          DSP_HARM_AMP(26U)
-#define DSP_HARM26_PHASE                        DSP_HARM_PHASE(26U)
-
-/* Harmonic 27 */
-#define DSP_HARM27_NO                           DSP_HARM_NUM(27U)
-#define DSP_HARM27_AMP                          DSP_HARM_AMP(27U)
-#define DSP_HARM27_PHASE                        DSP_HARM_PHASE(27U)
-
-/* Harmonic 28 */
-#define DSP_HARM28_NO                           DSP_HARM_NUM(28U)
-#define DSP_HARM28_AMP                          DSP_HARM_AMP(28U)
-#define DSP_HARM28_PHASE                        DSP_HARM_PHASE(28U)
-
-/* Harmonic 29 */
-#define DSP_HARM29_NO                           DSP_HARM_NUM(29U)
-#define DSP_HARM29_AMP                          DSP_HARM_AMP(29U)
-#define DSP_HARM29_PHASE                        DSP_HARM_PHASE(29U)
-
-/* Harmonic 30 */
-#define DSP_HARM30_NO                           DSP_HARM_NUM(30U)
-#define DSP_HARM30_AMP                          DSP_HARM_AMP(30U)
-#define DSP_HARM30_PHASE                        DSP_HARM_PHASE(30U)
-
-/* Harmonic 31 */
-#define DSP_HARM31_NO                           DSP_HARM_NUM(31U)
-#define DSP_HARM31_AMP                          DSP_HARM_AMP(31U)
-#define DSP_HARM31_PHASE                        DSP_HARM_PHASE(31U)
-
-/* Harmonic 32 */
-#define DSP_HARM32_NO                           DSP_HARM_NUM(32U)
-#define DSP_HARM32_AMP                          DSP_HARM_AMP(32U)
-#define DSP_HARM32_PHASE                        DSP_HARM_PHASE(32U)
-
-/* Harmonic 33 */
-#define DSP_HARM33_NO                           DSP_HARM_NUM(33U)
-#define DSP_HARM33_AMP                          DSP_HARM_AMP(33U)
-#define DSP_HARM33_PHASE                        DSP_HARM_PHASE(33U)
-
-/* Harmonic 34 */
-#define DSP_HARM34_NO                           DSP_HARM_NUM(34U)
-#define DSP_HARM34_AMP                          DSP_HARM_AMP(34U)
-#define DSP_HARM34_PHASE                        DSP_HARM_PHASE(34U)
-
-/* Harmonic 35 */
-#define DSP_HARM35_NO                           DSP_HARM_NUM(35U)
-#define DSP_HARM35_AMP                          DSP_HARM_AMP(35U)
-#define DSP_HARM35_PHASE                        DSP_HARM_PHASE(35U)
-
-/* Harmonic 36 */
-#define DSP_HARM36_NO                           DSP_HARM_NUM(36U)
-#define DSP_HARM36_AMP                          DSP_HARM_AMP(36U)
-#define DSP_HARM36_PHASE                        DSP_HARM_PHASE(36U)
-
-/* Harmonic 37 */
-#define DSP_HARM37_NO                           DSP_HARM_NUM(37U)
-#define DSP_HARM37_AMP                          DSP_HARM_AMP(37U)
-#define DSP_HARM37_PHASE                        DSP_HARM_PHASE(37U)
-
-/* Harmonic 38 */
-#define DSP_HARM38_NO                           DSP_HARM_NUM(38U)
-#define DSP_HARM38_AMP                          DSP_HARM_AMP(38U)
-#define DSP_HARM38_PHASE                        DSP_HARM_PHASE(38U)
-
-/* Harmonic 39 */
-#define DSP_HARM39_NO                           DSP_HARM_NUM(39U)
-#define DSP_HARM39_AMP                          DSP_HARM_AMP(39U)
-#define DSP_HARM39_PHASE                        DSP_HARM_PHASE(39U)
-
-/* Harmonic 40 */
-#define DSP_HARM40_NO                           DSP_HARM_NUM(40U)
-#define DSP_HARM40_AMP                          DSP_HARM_AMP(40U)
-#define DSP_HARM40_PHASE                        DSP_HARM_PHASE(40U)
-
-/* Harmonic 41 */
-#define DSP_HARM41_NO                           DSP_HARM_NUM(41U)
-#define DSP_HARM41_AMP                          DSP_HARM_AMP(41U)
-#define DSP_HARM41_PHASE                        DSP_HARM_PHASE(41U)
-
-/* Harmonic 42 */
-#define DSP_HARM42_NO                           DSP_HARM_NUM(42U)
-#define DSP_HARM42_AMP                          DSP_HARM_AMP(42U)
-#define DSP_HARM42_PHASE                        DSP_HARM_PHASE(42U)
-
-/* Harmonic 43 */
-#define DSP_HARM43_NO                           DSP_HARM_NUM(43U)
-#define DSP_HARM43_AMP                          DSP_HARM_AMP(43U)
-#define DSP_HARM43_PHASE                        DSP_HARM_PHASE(43U)
-
-/* Harmonic 44 */
-#define DSP_HARM44_NO                           DSP_HARM_NUM(44U)
-#define DSP_HARM44_AMP                          DSP_HARM_AMP(44U)
-#define DSP_HARM44_PHASE                        DSP_HARM_PHASE(44U)
-
-/* Harmonic 45 */
-#define DSP_HARM45_NO                           DSP_HARM_NUM(45U)
-#define DSP_HARM45_AMP                          DSP_HARM_AMP(45U)
-#define DSP_HARM45_PHASE                        DSP_HARM_PHASE(45U)
-
-/* Harmonic 46 */
-#define DSP_HARM46_NO                           DSP_HARM_NUM(46U)
-#define DSP_HARM46_AMP                          DSP_HARM_AMP(46U)
-#define DSP_HARM46_PHASE                        DSP_HARM_PHASE(46U)
-
-/* Harmonic 47 */
-#define DSP_HARM47_NO                           DSP_HARM_NUM(47U)
-#define DSP_HARM47_AMP                          DSP_HARM_AMP(47U)
-#define DSP_HARM47_PHASE                        DSP_HARM_PHASE(47U)
-
-/* Harmonic 48 */
-#define DSP_HARM48_NO                           DSP_HARM_NUM(48U)
-#define DSP_HARM48_AMP                          DSP_HARM_AMP(48U)
-#define DSP_HARM48_PHASE                        DSP_HARM_PHASE(48U)
-
-/* Harmonic 49 */
-#define DSP_HARM49_NO                           DSP_HARM_NUM(49U)
-#define DSP_HARM49_AMP                          DSP_HARM_AMP(49U)
-#define DSP_HARM49_PHASE                        DSP_HARM_PHASE(49U)
-
-/* Harmonic 50 */
-#define DSP_HARM50_NO                           DSP_HARM_NUM(50U)
-#define DSP_HARM50_AMP                          DSP_HARM_AMP(50U)
-#define DSP_HARM50_PHASE                        DSP_HARM_PHASE(50U)
+#define DSP_HARM_START_ADDR         (DSP_HARM_WAVEFORM_NUM + SIZE_U8)
 
 
-/* End of harmonic block */
-#define DSP_HARM_END_ADDR                      (DSP_HARM50_PHASE + SIZE_FLOAT)
+// ========================================================================
+// HARMONIC 1
+// ========================================================================
 
+#define DSP_HARM1_NUM               (DSP_HARM_START_ADDR)
+#define DSP_HARM1_PERCENT           (DSP_HARM1_NUM + SIZE_FLOAT)
+#define DSP_HARM1_PHASE             (DSP_HARM1_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 2
+// ========================================================================
+
+#define DSP_HARM2_NUM               (DSP_HARM1_PHASE + SIZE_FLOAT)
+#define DSP_HARM2_PERCENT           (DSP_HARM2_NUM + SIZE_FLOAT)
+#define DSP_HARM2_PHASE             (DSP_HARM2_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 3
+// ========================================================================
+
+#define DSP_HARM3_NUM               (DSP_HARM2_PHASE + SIZE_FLOAT)
+#define DSP_HARM3_PERCENT           (DSP_HARM3_NUM + SIZE_FLOAT)
+#define DSP_HARM3_PHASE             (DSP_HARM3_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 4
+// ========================================================================
+
+#define DSP_HARM4_NUM               (DSP_HARM3_PHASE + SIZE_FLOAT)
+#define DSP_HARM4_PERCENT           (DSP_HARM4_NUM + SIZE_FLOAT)
+#define DSP_HARM4_PHASE             (DSP_HARM4_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 5
+// ========================================================================
+
+#define DSP_HARM5_NUM               (DSP_HARM4_PHASE + SIZE_FLOAT)
+#define DSP_HARM5_PERCENT           (DSP_HARM5_NUM + SIZE_FLOAT)
+#define DSP_HARM5_PHASE             (DSP_HARM5_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 6
+// ========================================================================
+
+#define DSP_HARM6_NUM               (DSP_HARM5_PHASE + SIZE_FLOAT)
+#define DSP_HARM6_PERCENT           (DSP_HARM6_NUM + SIZE_FLOAT)
+#define DSP_HARM6_PHASE             (DSP_HARM6_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 7
+// ========================================================================
+
+#define DSP_HARM7_NUM               (DSP_HARM6_PHASE + SIZE_FLOAT)
+#define DSP_HARM7_PERCENT           (DSP_HARM7_NUM + SIZE_FLOAT)
+#define DSP_HARM7_PHASE             (DSP_HARM7_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 8
+// ========================================================================
+
+#define DSP_HARM8_NUM               (DSP_HARM7_PHASE + SIZE_FLOAT)
+#define DSP_HARM8_PERCENT           (DSP_HARM8_NUM + SIZE_FLOAT)
+#define DSP_HARM8_PHASE             (DSP_HARM8_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 9
+// ========================================================================
+
+#define DSP_HARM9_NUM               (DSP_HARM8_PHASE + SIZE_FLOAT)
+#define DSP_HARM9_PERCENT           (DSP_HARM9_NUM + SIZE_FLOAT)
+#define DSP_HARM9_PHASE             (DSP_HARM9_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 10
+// ========================================================================
+
+#define DSP_HARM10_NUM              (DSP_HARM9_PHASE + SIZE_FLOAT)
+#define DSP_HARM10_PERCENT          (DSP_HARM10_NUM + SIZE_FLOAT)
+#define DSP_HARM10_PHASE            (DSP_HARM10_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 11
+// ========================================================================
+
+#define DSP_HARM11_NUM              (DSP_HARM10_PHASE + SIZE_FLOAT)
+#define DSP_HARM11_PERCENT          (DSP_HARM11_NUM + SIZE_FLOAT)
+#define DSP_HARM11_PHASE            (DSP_HARM11_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 12
+// ========================================================================
+
+#define DSP_HARM12_NUM              (DSP_HARM11_PHASE + SIZE_FLOAT)
+#define DSP_HARM12_PERCENT          (DSP_HARM12_NUM + SIZE_FLOAT)
+#define DSP_HARM12_PHASE            (DSP_HARM12_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 13
+// ========================================================================
+
+#define DSP_HARM13_NUM              (DSP_HARM12_PHASE + SIZE_FLOAT)
+#define DSP_HARM13_PERCENT          (DSP_HARM13_NUM + SIZE_FLOAT)
+#define DSP_HARM13_PHASE            (DSP_HARM13_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 14
+// ========================================================================
+
+#define DSP_HARM14_NUM              (DSP_HARM13_PHASE + SIZE_FLOAT)
+#define DSP_HARM14_PERCENT          (DSP_HARM14_NUM + SIZE_FLOAT)
+#define DSP_HARM14_PHASE            (DSP_HARM14_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 15
+// ========================================================================
+
+#define DSP_HARM15_NUM              (DSP_HARM14_PHASE + SIZE_FLOAT)
+#define DSP_HARM15_PERCENT          (DSP_HARM15_NUM + SIZE_FLOAT)
+#define DSP_HARM15_PHASE            (DSP_HARM15_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 16
+// ========================================================================
+
+#define DSP_HARM16_NUM              (DSP_HARM15_PHASE + SIZE_FLOAT)
+#define DSP_HARM16_PERCENT          (DSP_HARM16_NUM + SIZE_FLOAT)
+#define DSP_HARM16_PHASE            (DSP_HARM16_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 17
+// ========================================================================
+
+#define DSP_HARM17_NUM              (DSP_HARM16_PHASE + SIZE_FLOAT)
+#define DSP_HARM17_PERCENT          (DSP_HARM17_NUM + SIZE_FLOAT)
+#define DSP_HARM17_PHASE            (DSP_HARM17_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 18
+// ========================================================================
+
+#define DSP_HARM18_NUM              (DSP_HARM17_PHASE + SIZE_FLOAT)
+#define DSP_HARM18_PERCENT          (DSP_HARM18_NUM + SIZE_FLOAT)
+#define DSP_HARM18_PHASE            (DSP_HARM18_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 19
+// ========================================================================
+
+#define DSP_HARM19_NUM              (DSP_HARM18_PHASE + SIZE_FLOAT)
+#define DSP_HARM19_PERCENT          (DSP_HARM19_NUM + SIZE_FLOAT)
+#define DSP_HARM19_PHASE            (DSP_HARM19_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 20
+// ========================================================================
+
+#define DSP_HARM20_NUM              (DSP_HARM19_PHASE + SIZE_FLOAT)
+#define DSP_HARM20_PERCENT          (DSP_HARM20_NUM + SIZE_FLOAT)
+#define DSP_HARM20_PHASE            (DSP_HARM20_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 21
+// ========================================================================
+
+#define DSP_HARM21_NUM              (DSP_HARM20_PHASE + SIZE_FLOAT)
+#define DSP_HARM21_PERCENT          (DSP_HARM21_NUM + SIZE_FLOAT)
+#define DSP_HARM21_PHASE            (DSP_HARM21_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 22
+// ========================================================================
+
+#define DSP_HARM22_NUM              (DSP_HARM21_PHASE + SIZE_FLOAT)
+#define DSP_HARM22_PERCENT          (DSP_HARM22_NUM + SIZE_FLOAT)
+#define DSP_HARM22_PHASE            (DSP_HARM22_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 23
+// ========================================================================
+
+#define DSP_HARM23_NUM              (DSP_HARM22_PHASE + SIZE_FLOAT)
+#define DSP_HARM23_PERCENT          (DSP_HARM23_NUM + SIZE_FLOAT)
+#define DSP_HARM23_PHASE            (DSP_HARM23_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 24
+// ========================================================================
+
+#define DSP_HARM24_NUM              (DSP_HARM23_PHASE + SIZE_FLOAT)
+#define DSP_HARM24_PERCENT          (DSP_HARM24_NUM + SIZE_FLOAT)
+#define DSP_HARM24_PHASE            (DSP_HARM24_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 25
+// ========================================================================
+
+#define DSP_HARM25_NUM              (DSP_HARM24_PHASE + SIZE_FLOAT)
+#define DSP_HARM25_PERCENT          (DSP_HARM25_NUM + SIZE_FLOAT)
+#define DSP_HARM25_PHASE            (DSP_HARM25_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 26
+// ========================================================================
+
+#define DSP_HARM26_NUM              (DSP_HARM25_PHASE + SIZE_FLOAT)
+#define DSP_HARM26_PERCENT          (DSP_HARM26_NUM + SIZE_FLOAT)
+#define DSP_HARM26_PHASE            (DSP_HARM26_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 27
+// ========================================================================
+
+#define DSP_HARM27_NUM              (DSP_HARM26_PHASE + SIZE_FLOAT)
+#define DSP_HARM27_PERCENT          (DSP_HARM27_NUM + SIZE_FLOAT)
+#define DSP_HARM27_PHASE            (DSP_HARM27_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 28
+// ========================================================================
+
+#define DSP_HARM28_NUM              (DSP_HARM27_PHASE + SIZE_FLOAT)
+#define DSP_HARM28_PERCENT          (DSP_HARM28_NUM + SIZE_FLOAT)
+#define DSP_HARM28_PHASE            (DSP_HARM28_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 29
+// ========================================================================
+
+#define DSP_HARM29_NUM              (DSP_HARM28_PHASE + SIZE_FLOAT)
+#define DSP_HARM29_PERCENT          (DSP_HARM29_NUM + SIZE_FLOAT)
+#define DSP_HARM29_PHASE            (DSP_HARM29_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 30
+// ========================================================================
+
+#define DSP_HARM30_NUM              (DSP_HARM29_PHASE + SIZE_FLOAT)
+#define DSP_HARM30_PERCENT          (DSP_HARM30_NUM + SIZE_FLOAT)
+#define DSP_HARM30_PHASE            (DSP_HARM30_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 31
+// ========================================================================
+
+#define DSP_HARM31_NUM              (DSP_HARM30_PHASE + SIZE_FLOAT)
+#define DSP_HARM31_PERCENT          (DSP_HARM31_NUM + SIZE_FLOAT)
+#define DSP_HARM31_PHASE            (DSP_HARM31_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 32
+// ========================================================================
+
+#define DSP_HARM32_NUM              (DSP_HARM31_PHASE + SIZE_FLOAT)
+#define DSP_HARM32_PERCENT          (DSP_HARM32_NUM + SIZE_FLOAT)
+#define DSP_HARM32_PHASE            (DSP_HARM32_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 33
+// ========================================================================
+
+#define DSP_HARM33_NUM              (DSP_HARM32_PHASE + SIZE_FLOAT)
+#define DSP_HARM33_PERCENT          (DSP_HARM33_NUM + SIZE_FLOAT)
+#define DSP_HARM33_PHASE            (DSP_HARM33_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 34
+// ========================================================================
+
+#define DSP_HARM34_NUM              (DSP_HARM33_PHASE + SIZE_FLOAT)
+#define DSP_HARM34_PERCENT          (DSP_HARM34_NUM + SIZE_FLOAT)
+#define DSP_HARM34_PHASE            (DSP_HARM34_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 35
+// ========================================================================
+
+#define DSP_HARM35_NUM              (DSP_HARM34_PHASE + SIZE_FLOAT)
+#define DSP_HARM35_PERCENT          (DSP_HARM35_NUM + SIZE_FLOAT)
+#define DSP_HARM35_PHASE            (DSP_HARM35_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 36
+// ========================================================================
+
+#define DSP_HARM36_NUM              (DSP_HARM35_PHASE + SIZE_FLOAT)
+#define DSP_HARM36_PERCENT          (DSP_HARM36_NUM + SIZE_FLOAT)
+#define DSP_HARM36_PHASE            (DSP_HARM36_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 37
+// ========================================================================
+
+#define DSP_HARM37_NUM              (DSP_HARM36_PHASE + SIZE_FLOAT)
+#define DSP_HARM37_PERCENT          (DSP_HARM37_NUM + SIZE_FLOAT)
+#define DSP_HARM37_PHASE            (DSP_HARM37_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 38
+// ========================================================================
+
+#define DSP_HARM38_NUM              (DSP_HARM37_PHASE + SIZE_FLOAT)
+#define DSP_HARM38_PERCENT          (DSP_HARM38_NUM + SIZE_FLOAT)
+#define DSP_HARM38_PHASE            (DSP_HARM38_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 39
+// ========================================================================
+
+#define DSP_HARM39_NUM              (DSP_HARM38_PHASE + SIZE_FLOAT)
+#define DSP_HARM39_PERCENT          (DSP_HARM39_NUM + SIZE_FLOAT)
+#define DSP_HARM39_PHASE            (DSP_HARM39_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 40
+// ========================================================================
+
+#define DSP_HARM40_NUM              (DSP_HARM39_PHASE + SIZE_FLOAT)
+#define DSP_HARM40_PERCENT          (DSP_HARM40_NUM + SIZE_FLOAT)
+#define DSP_HARM40_PHASE            (DSP_HARM40_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 41
+// ========================================================================
+
+#define DSP_HARM41_NUM              (DSP_HARM40_PHASE + SIZE_FLOAT)
+#define DSP_HARM41_PERCENT          (DSP_HARM41_NUM + SIZE_FLOAT)
+#define DSP_HARM41_PHASE            (DSP_HARM41_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 42
+// ========================================================================
+
+#define DSP_HARM42_NUM              (DSP_HARM41_PHASE + SIZE_FLOAT)
+#define DSP_HARM42_PERCENT          (DSP_HARM42_NUM + SIZE_FLOAT)
+#define DSP_HARM42_PHASE            (DSP_HARM42_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 43
+// ========================================================================
+
+#define DSP_HARM43_NUM              (DSP_HARM42_PHASE + SIZE_FLOAT)
+#define DSP_HARM43_PERCENT          (DSP_HARM43_NUM + SIZE_FLOAT)
+#define DSP_HARM43_PHASE            (DSP_HARM43_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 44
+// ========================================================================
+
+#define DSP_HARM44_NUM              (DSP_HARM43_PHASE + SIZE_FLOAT)
+#define DSP_HARM44_PERCENT          (DSP_HARM44_NUM + SIZE_FLOAT)
+#define DSP_HARM44_PHASE            (DSP_HARM44_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 45
+// ========================================================================
+
+#define DSP_HARM45_NUM              (DSP_HARM44_PHASE + SIZE_FLOAT)
+#define DSP_HARM45_PERCENT          (DSP_HARM45_NUM + SIZE_FLOAT)
+#define DSP_HARM45_PHASE            (DSP_HARM45_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 46
+// ========================================================================
+
+#define DSP_HARM46_NUM              (DSP_HARM45_PHASE + SIZE_FLOAT)
+#define DSP_HARM46_PERCENT          (DSP_HARM46_NUM + SIZE_FLOAT)
+#define DSP_HARM46_PHASE            (DSP_HARM46_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 47
+// ========================================================================
+
+#define DSP_HARM47_NUM              (DSP_HARM46_PHASE + SIZE_FLOAT)
+#define DSP_HARM47_PERCENT          (DSP_HARM47_NUM + SIZE_FLOAT)
+#define DSP_HARM47_PHASE            (DSP_HARM47_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 48
+// ========================================================================
+
+#define DSP_HARM48_NUM              (DSP_HARM47_PHASE + SIZE_FLOAT)
+#define DSP_HARM48_PERCENT          (DSP_HARM48_NUM + SIZE_FLOAT)
+#define DSP_HARM48_PHASE            (DSP_HARM48_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 49
+// ========================================================================
+
+#define DSP_HARM49_NUM              (DSP_HARM48_PHASE + SIZE_FLOAT)
+#define DSP_HARM49_PERCENT          (DSP_HARM49_NUM + SIZE_FLOAT)
+#define DSP_HARM49_PHASE            (DSP_HARM49_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// HARMONIC 50
+// ========================================================================
+
+#define DSP_HARM50_NUM              (DSP_HARM49_PHASE + SIZE_FLOAT)
+#define DSP_HARM50_PERCENT          (DSP_HARM50_NUM + SIZE_FLOAT)
+#define DSP_HARM50_PHASE            (DSP_HARM50_PERCENT + SIZE_FLOAT)
+
+
+// ========================================================================
+// END OF HARMONIC DATA
+// ========================================================================
+
+#define DSP_HARM_END_ADDR           (DSP_HARM50_PHASE + SIZE_FLOAT)
 
 // ========================================================================
 // 4. SLEW / PHASE / CONTROL SETTINGS (MCU -> DSP Phase X)

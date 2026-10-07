@@ -210,6 +210,7 @@ float32_t Vac_fb_pu;
 
 float32_t Ia_fb;
 
+float32_t Imon;
 
 
 float32_t Ib_fb;
