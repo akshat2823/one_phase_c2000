@@ -9,6 +9,7 @@
 #include "Common_Memmap.h"
 
 
+
 uint8_t data[4];
 
 uint16_t addr_prev;
@@ -647,6 +648,12 @@ void ReadingDataFromSharedMemory(void)
     SetSourceCurrent1P   = ReadFloatFromMainBuff(DSP_SET_IAC);
     SetSourceFrequency1P = ReadFloatFromMainBuff(DSP_SET_FREQ);
     SetVdc = ReadFloatFromMainBuff(DSP_SET_VDC);
+    SetPF_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
+    if(SetPF_CC == 0.0f)
+    {
+        SetPF_CC = 0.000001f;
+    }
+
     if(Slave1Flag)
     {
         SetSourcePhaseAB = ReadFloatFromMainBuff(DSP_PHASE_ANGLE);
@@ -666,9 +673,14 @@ void ReadingDataFromSharedMemory(void)
     SetLimIac  = ReadFloatFromMainBuff(DSP_LIM_IAC);
     SetLimFreq = ReadFloatFromMainBuff(DSP_LIM_FREQ);
     SetLimPow  = ReadFloatFromMainBuff(DSP_LIM_POW);
+
+    SetVdc  = ReadFloatFromMainBuff(DSP_SET_VDC);
+    SetPF_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
+    SetR_CR  = ReadFloatFromMainBuff(DSP_LOAD_CR_R);
+    SetP_CP  = ReadFloatFromMainBuff(DSP_LOAD_CP_P);
+    SetPF_CP = ReadFloatFromMainBuff(DSP_LOAD_CP_PF);
     SetLimVdcPlus = ReadFloatFromMainBuff(DSP_LIM_VDC_PLUS);
     SetLimVdcMinus = ReadFloatFromMainBuff(DSP_LIM_VDC_MINUS);
-
 
     // ========================================================================
     // 3. STATUS FLAGS (BYTE AREA)
@@ -714,6 +726,10 @@ void SyncCommToControl(void)
     // ---------- Setpoints: Comm -> Control ----------
     Vac_fundamental    = SetSourceVoltage1P;
     Iset               = SetSourceCurrent1P;
+    PFset              = SetPF_CC;
+    Rset               = SetR_CR;
+    Pkva_set           = SetP_CP;
+    PFSet_CP           = SetPF_CP;
     AC_Freq_Ref        = SetSourceFrequency1P;
     V_DC               = SetVdc;
     LoadSource_mode    = LoadSourceMode;

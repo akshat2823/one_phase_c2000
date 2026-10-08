@@ -80,7 +80,13 @@ extern int32_t val_prev_int;
 #define DSP_SET_IAC                             (DSP_SET_VAC + SIZE_FLOAT)
 #define DSP_SET_VDC                             (DSP_SET_IAC + SIZE_FLOAT)
 
-#define DSP_ADR_SET_R_TOP                       (DSP_SET_VDC + SIZE_FLOAT)
+#define DSP_LOAD_CR_R                           (DSP_SET_VDC + SIZE_FLOAT)
+#define DSP_LOAD_CP_P                           (DSP_LOAD_CR_R + SIZE_FLOAT)
+#define DSP_LOAD_CP_PF                          (DSP_LOAD_CP_P + SIZE_FLOAT)
+#define DSP_LOAD_CC_I_PF                        (DSP_LOAD_CP_PF + SIZE_FLOAT)
+
+
+#define DSP_ADR_SET_R_TOP                       (DSP_LOAD_CC_I_PF + SIZE_FLOAT)
 #define DSP_ADR_SET_L_TOP                       (DSP_ADR_SET_R_TOP + SIZE_FLOAT)
 #define DSP_ADR_SET_C_TOP                       (DSP_ADR_SET_L_TOP + SIZE_FLOAT)
 #define DSP_ADR_SET_RL_TOP                      (DSP_ADR_SET_C_TOP + SIZE_FLOAT)

@@ -69,6 +69,8 @@ extern float32_t SetPhaseAngle;
 extern float32_t SetLimVdcPlus;
 extern float32_t SetLimVdcMinus;
 extern float32_t SetVdc;
+extern float32_t SetPF_CC;
+extern float32_t SetR_CR;
 
 extern uint32_t SetMonMode;
 
@@ -100,7 +102,10 @@ extern float32_t Iset;
 extern float32_t Rset;
 extern float32_t Pkva_set;
 extern float32_t PFset;
-extern float32_t I_PFset;
+
+extern float32_t PFSet_CP;
+extern float32_t SetPF_CP;
+extern float32_t SetP_CP;
 
 extern float32_t R_top;
 extern float32_t L_top;

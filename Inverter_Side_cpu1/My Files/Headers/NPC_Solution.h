@@ -179,6 +179,7 @@ extern float32_t harm_Ref_A;
 extern float32_t harm_Ref_B;
 extern float32_t harm_Ref_C;
 extern float32_t sine_A_prv;
+extern uint16_t sign;
 //extern float32_t v_h_A[51];
 //extern float32_t v_h_B[51];
 //extern float32_t v_h_C[51];
@@ -664,7 +665,7 @@ static inline void NPC_readCurrentAndVoltageSignals(void)    // AC AND DC VOLTAG
     Va_fb =( ((float)Va_sns * Vgrid_Sense_scaling) + Vgrid_sense_offset_A);
     PPA_phaseA.v = Va_fb;
 
-    Vac_fb_pu = ((float)Va_sns - Vgrid_sense_offset_A)*Vgrid_Sense_scaling_PU;
+    Vac_fb_pu = ((float)Va_sns - Vgrid_sense_offset_B)*Vgrid_Sense_scaling_PU;
 
 
     Vc1_sns = (float)((AdcaResultRegs.ADCRESULT8 + AdcaResultRegs.ADCRESULT9 + AdcaResultRegs.ADCRESULT10 + AdcaResultRegs.ADCRESULT11)*0.25f);
@@ -1351,163 +1352,6 @@ static inline void updateDeadband_INV(void)
     }
 }
 
-//static inline void RUN_INV_ISR_SourceMode(void)
-//{
-//
-//    NPC_readCurrentAndVoltageSignals();  // ADC FEEDBACK
-//    NPC_run_internal_PLL();
-//    Ref_Gen_function();  // REFERENCE SINE GENERATION FUNC.
-//
-//    if(StartPowerStage == 0)
-//    {
-//        resetDeadband_DAB();
-//    }
-//
-//    if (StartPowerStage != StartPowerStage_prev)
-//    {
-//        if(StartPowerStage == 1)
-//        {
-//            float32_t target_on_angle = (float32_t)((ON_degree * PI) / 180.0f) + PI;
-//            if(target_on_angle > 2*PI) target_on_angle = target_on_angle - 2*PI;
-//            float32_t angle_diff = fabsf(pll_ang_A - target_on_angle);
-//            if (angle_diff <= ON_ANG_TOL)
-//            {
-////                REFslew_set(&VA_RefSlewRamp,0.0f);
-////                REFslew_set(&VdcRefSlewRamp,0.0f);
-////                NPC_HAL_ClearALLPWMTripFlags();
-//                NPC_HAL_ClearDAB_PWMTripFlags();
-//                DABreadyCounter = 10000;
-//                DABreadyFlag = TRUE;
-////                resetDeadband();
-//                resetDeadband_DAB();
-//                StartPowerStage_prev = StartPowerStage;
-//            }
-//        }
-//        else if (StartPowerStage == 0)
-//        {
-//            float32_t target_off_angle = (float32_t)((OFF_degree * PI) / 180.0f) + PI;
-//            if(target_off_angle > 2*PI) target_off_angle = target_off_angle - 2*PI;
-//            float32_t angle_diff = fabsf(pll_ang_A - target_off_angle);
-//            if (angle_diff <= OFF_ANG_TOL)
-//            {
-//                NPC_HAL_ForceOSTEVENTtoALLEPWM();
-////                err_VA = 0;
-////                resetPR_custom(&Testg1);
-////                resetDeadband();
-//                StartPowerStage_prev = StartPowerStage;
-//            }
-//        }
-//    }
-//
-//    if (StartPowerStage_Harm != StartPowerStage_Harm_prev)
-//    {
-//        if(StartPowerStage_Harm == 1)
-//        {
-//            float32_t target_on_angle = (float32_t)((ON_degree * PI) / 180.0f);
-//            float32_t angle_diff = fabsf(pll_ang_A - target_on_angle);
-//
-//            if(angle_diff > PI) angle_diff = (float32_t)((2 * PI) - angle_diff);
-//            if(angle_diff <= ON_ANG_TOL)
-//            {
-//                REFslew_set(&VA_RefSlewRamp,0.0f);
-//                REFslew_set(&VdcRefSlewRamp,0.0f);
-////                close_VoltageLoop = 1;
-//                NPC_HAL_ClearALLPWMTripFlags();
-//                StartPowerStage_Harm_prev = StartPowerStage_Harm;
-//            }
-//        }
-//        else if (StartPowerStage_Harm == 0)
-//        {
-//            float32_t target_off_angle = (float32_t)((OFF_degree * PI) / 180.0f);
-//            float32_t angle_diff = fabsf(pll_ang_A - target_off_angle);
-//
-//            if(angle_diff > PI) angle_diff = (float32_t)((2 * PI) - angle_diff);
-//            if(angle_diff <= OFF_ANG_TOL)
-//            {
-//                NPC_HAL_ForceOSTEVENTtoALLEPWM();
-//                StartPowerStage_Harm_prev = StartPowerStage_Harm;
-////                err_VA = 0;
-//            }
-//        }
-//    }
-//
-//    if(DABreadyCounter > 0) DABreadyCounter--;
-//    else{}
-//
-//    if(DABreadyCounter == 0 && DABreadyFlag == TRUE)
-//    {
-//        REFslew_set(&VA_RefSlewRamp,0.0f);
-//        REFslew_set(&VdcRefSlewRamp,0.0f);
-//        NPC_HAL_ClearINV_PWMTripFlags();
-//        resetDeadband_INV();
-//        DABreadyFlag = FALSE;
-//    }
-//
-//    if(DABreadyFlag == FALSE)
-//
-//    kpI_1H = kpI_test;
-//    kiI_1H = kiI_test;
-//    wrcI_1H = wrcI_test;
-//    woI_1H = 2.0*PI*AC_FREQ_HZ;
-//
-//    computeDF22_PRcontrollerCoeff(&Testg1, kpI_1H,kiI_1H,woI_1H,
-//                                             ISR_FREQUENCY,wrcI_1H);
-//
-//
-////    REFslew_run(&VA_RefSlewRamp, Vac_fundamental, slope_VacRef);
-//    REFslew_run(&VA_RefSlewRamp, 1.0, slope_VacRef);
-//    REFslew_run(&VdcRefSlewRamp, V_DC, slope_VacRef);
-//    VA_RefSlewed = VA_RefSlewRamp.out_slew;
-//    Vdc_RefSlewed = VdcRefSlewRamp.out_slew;
-////    Va_ref = (1.4142f * VA_RefSlewed*Ref_A) + Vdc_RefSlewed;  // three different amplitude of sine.
-////    Va_ref = (1.4142f * VA_RefSlewed*Ref_A) - Vdc_RefSlewed;  // three different amplitude of sine.
-//    Va_ref = VA_RefSlewed * Ref_A;
-//
-////    uint16_t x = (uint16_t)(((Va_ref/dividingFactor)*dacScalingFactor) + dacOffset);
-////    NPC_HAL_passDAC_AVals(x);
-//
-//       err_VA = (float)(Va_ref - Va_fb);  // ERROR SIGNAL GIVEN TO CONTROLLER.
-//
-////       uint16_t y = (uint16_t)(((err_VA/dividingFactor)*dacScalingFactor) + dacOffset);
-////       NPC_HAL_passDAC_BVals(y);
-//
-////       uk_Va  = runPR_custom(&Testg1, err_VA);
-////       Ma1 = (float)(uk_Va + Va_fb)/(400);   // PR-CONTROLLER OUTPUT + FEEDFORWARD.
-//       Ma1 = openLoopGain * Va_ref;
-// //      Ma1 = (uk_Va+Va_ref)/100.0f;
-//
-////       pi_I_inv.Kp = uk_kp;
-////       pi_I_inv.Ki = uk_ki;
-////       uk_Ia = runPI_Custom(&pi_I_inv, Va_ref, Va_fb);
-//////       Mff = Va_fb*0.001f;
-////
-//////       Ma1 = uk_Ia + Mff;
-////       Ma1 = uk_Ia;
-//
-//
-//       Mb1 = 0.0f;  // DAB Duty
-//       Mc1 = 0.0f;  // DAB Duty
-//
-//       NPC_Calculate_duty(Ma1, Mb1, Mc1);
-////       updateDeadband();
-//       updateDeadband_DAB();
-//       updateDeadband_INV();
-//       NPC_HAL_updatePWMDutyAndDeadBand(dutyA_S1_Ref,
-//                                        dutyB_S1_Ref,
-//                                        dutyC_S1_Ref,
-//                                        dutyN_S1_Ref,
-//                                        dutyE_S1_Ref,
-//                                        dutyF_S1_Ref,
-//                                        DeadBand_DAB,
-//                                        DeadBand_INV);
-//
-////        // Soft Start//
-////           DeadBand = DBTicks-1;
-////        if(DeadBand >= DBTicks)
-////        {
-////            DeadBand = DeadBand - 1;
-////        }
-//}
 
 
 static inline void DeadBand_Sequence_Manager(void)
@@ -1937,6 +1781,9 @@ static inline void RUN_INV_ISR_LoadMode(void)
 {
     NPC_readCurrentAndVoltageSignals();  // ADC FEEDBACK
     SPLL_1PH_SOGI_run(&V_line_pll, Vac_fb_pu);
+    NPC_HAL_passDAC_AVals((uint16_t)(2048.0f+Ia_ref));
+
+ //   phase_angle = acosf(-SetPF_CC) * (180.0f / 3.141592653f);
 
     if (StartPowerStage != StartPowerStage_prev)
     {
@@ -1944,10 +1791,14 @@ static inline void RUN_INV_ISR_LoadMode(void)
         {
             REFslew_set(&IA_RefSlewRamp,0.0f);
             NPC_HAL_ClearALLPWMTripFlags();
+            resetBothDeadbands();
+            DeadBandSeqState_t = DB_STATE_GATE_DRIVE_ON;
             StartPowerStage_prev = StartPowerStage;
         }
         else if (StartPowerStage == 0)
         {
+
+            DeadBandSeqState_t = DB_STATE_DAB_OFF;
             StartPowerStage_prev = StartPowerStage;
         }
     }
@@ -1955,13 +1806,84 @@ static inline void RUN_INV_ISR_LoadMode(void)
     if(StartPowerStage == 0) resetPI_Custom(&pi_I_inv);
     else;
 
+    DeadBand_Sequence_Manager();
+
     float32_t I_ref_slew = ((float32_t)(0.01/(0.001*ISR_FREQUENCY)));
 
-    REFslew_run(&IacRefSlewRamp, -Iset, I_ref_slew);
+   // REFslew_run(&IacRefSlewRamp, -Iset, I_ref_slew);
     REFslew_run(&Idc_RefSlewRamp, -Iset_dc, I_ref_slew);
     IA_RefSlewed = IacRefSlewRamp.out_slew;
     Idc_RefSlewed = Idc_RefSlewRamp.out_slew;
-    Ia_ref = (1.414f) * IA_RefSlewed * sinf(V_line_pll.theta[1]-((3.141592653f * phase_angle)/180.0f) + 3.141592653f) - Idc_RefSlewed;
+   // Ia_ref = (1.414f) * IA_RefSlewed * sinf(V_line_pll.theta[1]-((3.141592653f * phase_angle)/180.0f) + 3.141592653f) - Idc_RefSlewed;
+
+    REFslew_run(&IacRefSlewRamp, Iset, I_ref_slew);
+
+//    if(SetPF_CC >= 0.0f)
+//    {
+//        phase_angle = acosf(SetPF_CC);
+//
+//        if(SetPF_CC > 0.0f)
+//        {
+//            sign = 1;
+//        }
+//    }
+//    else
+//    {
+//        phase_angle = fabsf(-acosf(-SetPF_CC));
+//    }
+
+    float32_t PF_Mag;
+
+    // Limit PF command between -1 and +1
+    if(SetPF_CC > 1.0f)
+    {
+        SetPF_CC = 1.0f;
+    }
+    else if(SetPF_CC < -1.0f)
+    {
+        SetPF_CC = -1.0f;
+    }
+
+    // Get PF magnitude
+    PF_Mag = fabsf(SetPF_CC);
+
+    phase_angle = acosf(PF_Mag);
+
+    // ------------------------------------------------------------
+    // PF convention:
+    //
+    // +PF = Lagging current
+    // -PF = Leading current
+    //
+    // Current reference equation:
+    // sin(theta - phase_angle)
+    //
+    // Positive phase_angle -> lagging
+    // Negative phase_angle -> leading
+    // ------------------------------------------------------------
+
+    float32_t phase_angle;
+
+    if(SetPF_CC > 1.0f)
+    {
+        SetPF_CC = 1.0f;
+    }
+    else if(SetPF_CC < -1.0f)
+    {
+        SetPF_CC = -1.0f;
+    }
+
+    phase_angle = acosf(fabsf(SetPF_CC));
+
+    if(SetPF_CC < 0.0f)
+    {
+        phase_angle = -phase_angle;
+    }
+
+    Ia_ref = 1.41421356f *
+             IA_RefSlewed *
+             sinf(V_line_pll.theta[1] - phase_angle)
+             - Idc_RefSlewed;
 
 
     /*

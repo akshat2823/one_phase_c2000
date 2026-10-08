@@ -112,13 +112,9 @@ void main(void)
     SPLL_1PH_SOGI_config(&spll_line, AC_FREQ_HZ, ISR_FREQUENCY, (float32_t)(222.2862), (float32_t)(-222.034));
 
     SPLL_1PH_SOGI_reset(&V_line_pll);
-//    SPLL_1PH_SOGI_config(&V_line_pll,
-//                         AC_FREQ_HZ,
-//                         ISR_FREQUENCY,
-//                         (float32_t) 166.9743385,
-//                         (float32_t) -166.2661165);
+
     SPLL_1PH_SOGI_config(&V_line_pll, AC_FREQ_HZ, ISR_FREQUENCY, (float32_t)(222.2862), (float32_t)(-222.034));
-    SPLL_1PH_SOGI_coeff_calc(&V_line_pll);
+  //  SPLL_1PH_SOGI_coeff_calc(&V_line_pll);
 
     SPLL_1PH_SOGI_config(&sogi_Ia, AC_FREQ_HZ, ISR_FREQUENCY, (float32_t)(222.2862), (float32_t)(-222.034));
 
@@ -300,7 +296,7 @@ interrupt void ISR(void)
     else
     {
         RUN_INV_ISR_SourceMode();
-//        RUN_INV_ISR_SourceMode_CC_Loop();
+      //  RUN_INV_ISR_LoadMode();
     }
 
 

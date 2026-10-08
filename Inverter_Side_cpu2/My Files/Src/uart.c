@@ -211,6 +211,10 @@ void SyncCommToControl(void)
     // ---------- Setpoints: Comm -> Control ----------
     Vac_fundamental    = SetSourceVoltage1P;
     Iset               = SetSourceCurrent1P;
+    PFset              = SetPF_CC;
+    Rset               = SetR_CR;
+    Pkva_set           = SetP_CP;
+    PFSet_CP           = SetPF_CP;
     AC_Freq_Ref        = SetSourceFrequency1P;
     V_DC               = SetVdc;
     LoadSource_mode    = LoadSourceMode;

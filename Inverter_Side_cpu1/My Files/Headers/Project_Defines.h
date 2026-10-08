@@ -475,7 +475,7 @@
 #define Temp_Scaling            (float32_t)(3/4095) //(float32_t)(3/65535) //
 
 //#define Vgrid_sense_offset_A  2251 //2265 //36060     //
-#define Vgrid_sense_offset_B  2258 //36060     //
+#define Vgrid_sense_offset_B  2255 //36060     //
 #define Vgrid_sense_offset_C  2251 //36060     //
 #define VDC_sense_offset      2252
 
@@ -497,7 +497,7 @@
 #define ISR_FREQUENCY   (float32_t)(Fswitching)
 #define ISR2_FREQUENCY_HZ  (Uint16)(1000)             //(Fswitching/100)
 #define ISR3_FREQUENCY_HZ  (Uint16)(12800)
-#define AC_FREQ_HZ      400
+#define AC_FREQ_HZ      50
 
 #define PI      ((float32_t)3.141592653589)
 #define ON_ANG_TOL      ((float32_t)(PI/180.0f)*5.0f)        //off_angle tolerance is at 1 degree

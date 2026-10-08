@@ -65,6 +65,7 @@ f32_to_u16 PLL_angle_DAC;
 
 //CC mode
 float32_t phase_angle;
+uint16_t sign;
 SPLL_1PH_SOGI V_line_pll;
 SPLL_1PH_SOGI sogi_Ia;
 float32_t Id_ref = 0.0f, Iq_ref = 0.0f;

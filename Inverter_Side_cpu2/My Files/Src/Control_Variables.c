@@ -49,6 +49,11 @@ float32_t SetPhaseAngle = 0.0f;
 float32_t SetLimVdcPlus = 0.0f;
 float32_t SetLimVdcMinus = 0.0f;
 float32_t SetVdc   = 0.0f;
+float32_t SetPF_CC   = 0.0f;
+float32_t SetR_CR    = 0.0f;
+float32_t SetP_CP    = 0.0f;
+float32_t SetPF_CP   = 0.0f;
+
 
 uint32_t LoadSourceMode;
 
@@ -65,7 +70,7 @@ float32_t Iset                  = 0.0f;
 float32_t Rset                  = 0.0f;
 float32_t Pkva_set              = 0.0f;
 float32_t PFset                 = 0.0f;
-float32_t I_PFset               = 0.0f;
+float32_t PFSet_CP               = 0.0f;
 
 float32_t R_top                 = 0.0f;
 float32_t L_top                 = 0.0f;

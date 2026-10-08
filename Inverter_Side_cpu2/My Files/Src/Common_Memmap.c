@@ -689,6 +689,10 @@ void ProcessData(void)
     SetLimPow  = ReadFloatFromMainBuff(DSP_LIM_POW);
 
     SetVdc  = ReadFloatFromMainBuff(DSP_SET_VDC);
+    SetPF_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
+    SetR_CR  = ReadFloatFromMainBuff(DSP_LOAD_CR_R);
+    SetP_CP  = ReadFloatFromMainBuff(DSP_LOAD_CP_P);
+    SetPF_CP = ReadFloatFromMainBuff(DSP_LOAD_CP_PF);
     SetLimVdcPlus = ReadFloatFromMainBuff(DSP_LIM_VDC_PLUS);
     SetLimVdcMinus = ReadFloatFromMainBuff(DSP_LIM_VDC_MINUS);
 
