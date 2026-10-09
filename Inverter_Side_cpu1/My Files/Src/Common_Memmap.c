@@ -629,17 +629,17 @@ void ReadingDataFromSharedMemory(void)
     Load_mode = ReadByteFromMainBuff(DSP_LOAD_MODE);
     Selected_Topology = ReadByteFromMainBuff(DSP_TOPOLOGY_SELECT);
 
-    R_top  = ReadFloatFromMainBuff(DSP_ADR_SET_R_TOP);
-    L_top = ReadFloatFromMainBuff(DSP_ADR_SET_L_TOP);
-    C_top = ReadFloatFromMainBuff(DSP_ADR_SET_C_TOP);
-    RL_top = ReadFloatFromMainBuff(DSP_ADR_SET_RL_TOP);
-    RC_top = ReadFloatFromMainBuff(DSP_ADR_SET_RC_TOP);
-    RS_top = ReadFloatFromMainBuff(DSP_ADR_SET_RS_TOP);
-    P_top = ReadFloatFromMainBuff(DSP_ADR_SET_P_TOP);
-    QL_top = ReadFloatFromMainBuff(DSP_ADR_SET_QL_TOP);
-    QC_top  = ReadFloatFromMainBuff(DSP_ADR_SET_QC_TOP);
-    IL_top = ReadFloatFromMainBuff(DSP_ADR_SET_IL_TOP);
-    VC_top = ReadFloatFromMainBuff(DSP_ADR_SET_VC_TOP);
+    // TUSTIN Coefficients from STM32
+    Coeff_B0    = ReadFloatFromMainBuff(DSP_COEFF_B0);
+    Coeff_B1    = ReadFloatFromMainBuff(DSP_COEFF_B1);
+    Coeff_B2    = ReadFloatFromMainBuff(DSP_COEFF_B2);
+    Coeff_A1    = ReadFloatFromMainBuff(DSP_COEFF_A1);
+    Coeff_A2    = ReadFloatFromMainBuff(DSP_COEFF_A2);
+
+    P_top       = ReadFloatFromMainBuff(DSP_ADR_SET_P_TOP);
+    QL_top      = ReadFloatFromMainBuff(DSP_ADR_SET_QL_TOP);
+    QC_top      = ReadFloatFromMainBuff(DSP_ADR_SET_QC_TOP);
+
 
     // ========================================================================
     // 1. SOURCE SETPOINTS (FLOAT AREA)
@@ -648,11 +648,7 @@ void ReadingDataFromSharedMemory(void)
     SetSourceCurrent1P   = ReadFloatFromMainBuff(DSP_SET_IAC);
     SetSourceFrequency1P = ReadFloatFromMainBuff(DSP_SET_FREQ);
     SetVdc = ReadFloatFromMainBuff(DSP_SET_VDC);
-    SetPF_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
-    if(SetPF_CC == 0.0f)
-    {
-        SetPF_CC = 0.000001f;
-    }
+    SetPhaseAngle_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
 
     if(Slave1Flag)
     {
@@ -675,7 +671,7 @@ void ReadingDataFromSharedMemory(void)
     SetLimPow  = ReadFloatFromMainBuff(DSP_LIM_POW);
 
     SetVdc  = ReadFloatFromMainBuff(DSP_SET_VDC);
-    SetPF_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
+    SetPhaseAngle_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
     SetR_CR  = ReadFloatFromMainBuff(DSP_LOAD_CR_R);
     SetP_CP  = ReadFloatFromMainBuff(DSP_LOAD_CP_P);
     SetPF_CP = ReadFloatFromMainBuff(DSP_LOAD_CP_PF);
@@ -726,7 +722,7 @@ void SyncCommToControl(void)
     // ---------- Setpoints: Comm -> Control ----------
     Vac_fundamental    = SetSourceVoltage1P;
     Iset               = SetSourceCurrent1P;
-    PFset              = SetPF_CC;
+    PhaseAngleSet_CC   = SetPhaseAngle_CC;
     Rset               = SetR_CR;
     Pkva_set           = SetP_CP;
     PFSet_CP           = SetPF_CP;

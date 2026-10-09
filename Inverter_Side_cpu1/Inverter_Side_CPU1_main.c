@@ -296,7 +296,6 @@ interrupt void ISR(void)
     else
     {
         RUN_INV_ISR_SourceMode();
-      //  RUN_INV_ISR_LoadMode();
     }
 
 

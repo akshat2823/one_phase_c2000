@@ -25,95 +25,85 @@
     uint16_t r_Buff2[1024] = {0x0000};
 
 
-    void handle_Display_uart(uint16_t r_Buff[], uint16_t size)
+void handle_Display_uart(uint16_t r_Buff[], uint16_t size)
+{
+
+    int k = 0;
+    int n = 0;
+
+    if(r_Buff[0] == receiveHeader_setVal || r_Buff[0] == receiveHeader_MeasVal)
     {
-
-        int k = 0;
-        int n = 0;
-
-        if(r_Buff[0] == receiveHeader_setVal || r_Buff[0] == receiveHeader_MeasVal)
+        for(n = 0; n < size; n++)
         {
-            for(n = 0; n < size; n++)
-            {
-                r_Buff2[n] = r_Buff[n];
-            }
-        }
-        else{
-            for(k = 0; k < size; k++)
-            {
-                if(r_Buff[k] == receiveHeader_setVal || r_Buff[k] == receiveHeader_MeasVal)
-                    break;
-            }
-            for(n = 0; n < size; n++)
-            {
-                r_Buff2[n] = r_Buff[n + k];
-            }
-        }
-
-        if(r_Buff2[0] == receiveHeader_setVal && r_Buff2[(size - k) - 1] == 0x00EF)
-        {
-
-            uint16_t crcCheck = crc16(r_Buff2, (size - k)- 1);
-
-            if(crcCheck == 0x0000)
-            {
-                Start_Address = r_Buff2[1]*256 + r_Buff2[2];
-                DataSize = r_Buff2[3]*256 + r_Buff2[4];
-
-                if(Start_Address == (uint16_t)DSP_SET_START_ADDR)
-                {
-                    uint16_t p = 0;
-                    for(p = 0; p < DataSize; p++)
-                    {
-                        Receive_Buf_Secondary[Start_Address + p] = r_Buff2[5 + p];
-                        cpu2Write[Start_Address + p] = r_Buff2[5 + p];
-                    }
-    //                SetDataUpdate();
-                    ProcessData();
-                    SyncCommToControl();
-                }
-                else
-                {
-                    uint16_t p = 0;
-                    for(p = 0; p < DataSize; p++)
-                    {
-                        Receive_Buf_Secondary[Start_Address + p] = r_Buff2[5 + p];
-                    }
-    //                HarmonicTableUpdate(Start_Address, DataSize);
-
-                    uint16_t q = 0;
-                    for(q = 0; q < MAX_LENGTH; q++)
-                    {
-                        Receive_Buf_Primary[q] = 0x0000;
-                    }
-
-    //                harmonicChunk++;
-    //
-    //                if(harmonicChunk == 5)
-    //                {
-    //                    ackDataReceive();
-    //                    harmonicChunk = 0;
-    //                }
-    //                else{}
-                }
-
-            }
-
-        }
-
-        else if(r_Buff2[0] == receiveHeader_MeasVal && r_Buff2[(size - k) - 1] == 0x00EF)
-        {
-            uint16_t crcCheck = crc16(r_Buff2, (size - k)- 1);
-
-            if(crcCheck == 0x0000)
-            {
-                    SyncCommToControl();
-                    send_Data_to_STM();
-
-            }
-
+            r_Buff2[n] = r_Buff[n];
         }
     }
+    else{
+        for(k = 0; k < size; k++)
+        {
+            if(r_Buff[k] == receiveHeader_setVal || r_Buff[k] == receiveHeader_MeasVal)
+                break;
+        }
+        for(n = 0; n < size; n++)
+        {
+            r_Buff2[n] = r_Buff[n + k];
+        }
+    }
+
+    if(r_Buff2[0] == receiveHeader_setVal && r_Buff2[(size - k) - 1] == 0x00EF)
+    {
+
+        uint16_t crcCheck = crc16(r_Buff2, (size - k)- 1);
+
+        if(crcCheck == 0x0000)
+        {
+            Start_Address = r_Buff2[1]*256 + r_Buff2[2];
+            DataSize = r_Buff2[3]*256 + r_Buff2[4];
+
+            if(Start_Address == (uint16_t)DSP_SET_START_ADDR)
+            {
+                uint16_t p = 0;
+                for(p = 0; p < DataSize; p++)
+                {
+                    Receive_Buf_Secondary[Start_Address + p] = r_Buff2[5 + p];
+                    cpu2Write[Start_Address + p] = r_Buff2[5 + p];
+                }
+                ProcessData();
+                SyncCommToControl();
+            }
+            else
+            {
+                uint16_t p = 0;
+                for(p = 0; p < DataSize; p++)
+                {
+                    Receive_Buf_Secondary[Start_Address + p] = r_Buff2[5 + p];
+                }
+
+                uint16_t q = 0;
+                for(q = 0; q < MAX_LENGTH; q++)
+                {
+                    Receive_Buf_Primary[q] = 0x0000;
+                }
+
+            }
+
+        }
+
+    }
+
+    else if(r_Buff2[0] == receiveHeader_MeasVal && r_Buff2[(size - k) - 1] == 0x00EF)
+    {
+        uint16_t crcCheck = crc16(r_Buff2, (size - k)- 1);
+
+        if(crcCheck == 0x0000)
+        {
+                SyncCommToControl();
+                send_Data_to_STM();
+
+        }
+
+    }
+}
 
 void send_Data_to_STM(void)
 {
@@ -211,7 +201,7 @@ void SyncCommToControl(void)
     // ---------- Setpoints: Comm -> Control ----------
     Vac_fundamental    = SetSourceVoltage1P;
     Iset               = SetSourceCurrent1P;
-    PFset              = SetPF_CC;
+    PhaseAngleSet_CC   = SetPhaseAngle_CC;
     Rset               = SetR_CR;
     Pkva_set           = SetP_CP;
     PFSet_CP           = SetPF_CP;

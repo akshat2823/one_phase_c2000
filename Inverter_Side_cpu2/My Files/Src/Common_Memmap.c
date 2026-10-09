@@ -689,25 +689,24 @@ void ProcessData(void)
     SetLimPow  = ReadFloatFromMainBuff(DSP_LIM_POW);
 
     SetVdc  = ReadFloatFromMainBuff(DSP_SET_VDC);
-    SetPF_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
+    SetPhaseAngle_CC = ReadFloatFromMainBuff(DSP_LOAD_CC_I_PF);
     SetR_CR  = ReadFloatFromMainBuff(DSP_LOAD_CR_R);
     SetP_CP  = ReadFloatFromMainBuff(DSP_LOAD_CP_P);
     SetPF_CP = ReadFloatFromMainBuff(DSP_LOAD_CP_PF);
     SetLimVdcPlus = ReadFloatFromMainBuff(DSP_LIM_VDC_PLUS);
     SetLimVdcMinus = ReadFloatFromMainBuff(DSP_LIM_VDC_MINUS);
 
+    // TUSTIN Coefficients from STM32
+    Coeff_B0    = ReadFloatFromMainBuff(DSP_COEFF_B0);
+    Coeff_B1    = ReadFloatFromMainBuff(DSP_COEFF_B1);
+    Coeff_B2    = ReadFloatFromMainBuff(DSP_COEFF_B2);
+    Coeff_A1    = ReadFloatFromMainBuff(DSP_COEFF_A1);
+    Coeff_A2    = ReadFloatFromMainBuff(DSP_COEFF_A2);
 
-    R_top  = ReadFloatFromMainBuff(DSP_ADR_SET_R_TOP);
-    L_top = ReadFloatFromMainBuff(DSP_ADR_SET_L_TOP);
-    C_top = ReadFloatFromMainBuff(DSP_ADR_SET_C_TOP);
-    RL_top = ReadFloatFromMainBuff(DSP_ADR_SET_RL_TOP);
-    RC_top = ReadFloatFromMainBuff(DSP_ADR_SET_RC_TOP);
-    RS_top = ReadFloatFromMainBuff(DSP_ADR_SET_RS_TOP);
-    P_top = ReadFloatFromMainBuff(DSP_ADR_SET_P_TOP);
-    QL_top = ReadFloatFromMainBuff(DSP_ADR_SET_QL_TOP);
-    QC_top  = ReadFloatFromMainBuff(DSP_ADR_SET_QC_TOP);
-    IL_top = ReadFloatFromMainBuff(DSP_ADR_SET_IL_TOP);
-    VC_top = ReadFloatFromMainBuff(DSP_ADR_SET_VC_TOP);
+    P_top       = ReadFloatFromMainBuff(DSP_ADR_SET_P_TOP);
+    QL_top      = ReadFloatFromMainBuff(DSP_ADR_SET_QL_TOP);
+    QC_top      = ReadFloatFromMainBuff(DSP_ADR_SET_QC_TOP);
+    //------------------------------------------------------
 
     SelMode = ReadByteFromMainBuff(DSP_ACPS_MODE);
     LoadSourceMode = ReadByteFromMainBuff(DSP_LOAD_SOURCE_MODE);

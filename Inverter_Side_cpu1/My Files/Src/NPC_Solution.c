@@ -39,6 +39,8 @@ int check2 = 0;
 float y[2] = {0};
 float alpha = 0.001;
 
+ float32_t phase_angle_rad;
+
 uint16_t LUT_Size =720;
 
 
@@ -48,6 +50,13 @@ uint16_t Imon_dac_count = 0;
 volatile float x1,x2,y1,y2,m,c;
 volatile float calculated_sin_value;
 volatile float32_t Angle_Step;
+
+float32_t Vac_Peak_PU = 0.0f;
+float32_t Vac_Peak = 0.0f;
+float32_t Vac_RMS = 0.0f;
+
+// Example only: use your actual voltage per-unit base
+
 
 DeadBandSeqState DeadBandSeqState_t = DB_STATE_OFF;
 uint16_t InvStartDelayCounter = 0;
@@ -76,6 +85,19 @@ float32_t alpha_ref = 0.0f;
 float32_t kpI_test = 1.0f, kiI_test = 1000.0f, woI_test, wrcI_test = 0.00628f;
 
 float32_t Iset_dc;
+
+// Present voltage and current samples
+float32_t Vn = 0.0f;
+float32_t In = 0.0f;
+
+// Previous voltage samples
+float32_t Vn_1 = 0.0f;
+float32_t Vn_2 = 0.0f;
+
+// Previous current samples
+float32_t In_1 = 0.0f;
+float32_t In_2 = 0.0f;
+
 
 /***********************************************
  ******Analog Prgramming & Monitoring Variables

@@ -61,7 +61,7 @@ extern float32_t SetLimFreq;
 extern  float32_t SetLimVdcPlus;
 extern  float32_t SetLimVdcMinus;
 extern  float32_t SetVdc;
-extern float32_t SetPF_CC;
+extern float32_t SetPhaseAngle_CC;
 extern float32_t SetR_CR;
 extern float32_t SetP_CP;
 extern float32_t SetPF_CP;
@@ -77,20 +77,18 @@ extern float32_t slope_VacRef;
 extern float32_t Iset;
 extern float32_t Rset;
 extern float32_t Pkva_set;
-extern float32_t PFset;
+extern float32_t PhaseAngleSet_CC;
 extern float32_t PFSet_CP;
 
-extern float32_t R_top;
-extern float32_t L_top;
-extern float32_t C_top;
-extern float32_t RL_top;
-extern float32_t RC_top;
-extern float32_t RS_top;
+extern float32_t Coeff_B0;
+extern float32_t Coeff_B1;
+extern float32_t Coeff_B2;
+extern float32_t Coeff_A1;
+extern float32_t Coeff_A2;
 extern float32_t P_top;
 extern float32_t QL_top;
 extern float32_t QC_top;
-extern float32_t IL_top;
-extern float32_t VC_top;
+
 
 extern float32_t V_DC_slope;
 extern float32_t slope_FreqRef;
